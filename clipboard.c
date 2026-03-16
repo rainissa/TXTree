@@ -16,9 +16,41 @@ void setCursor(int posisi)
     }
 }
 
+/* INPUT TEKS
+   Jika panjang baris penuh maka otomatis pindah baris
+*/
+void inputText(char teks[])
+{
+    int i = 0;
+
+    while (teks[i] != '\0')
+    {
+        int panjang = strlen(dokumen[cursor]);
+
+        /* jika baris sudah penuh */
+        if (panjang >= MAX_KARAKTER - 1)
+        {
+            if (jumlahBaris >= MAX_BARIS - 1)
+            {
+                printf("Dokumen penuh\n");
+                return;
+            }
+
+            cursor++;
+            jumlahBaris++;
+            dokumen[cursor][0] = '\0';
+        }
+
+        int pos = strlen(dokumen[cursor]);
+        dokumen[cursor][pos] = teks[i];
+        dokumen[cursor][pos + 1] = '\0';
+
+        i++;
+    }
+}
+
 /* COPY
-   Memindahkan satu baris ke clipboard
-   sekaligus menghapus dari dokumen
+   hanya menyalin baris ke clipboard
 */
 void copyLine()
 {
@@ -30,19 +62,11 @@ void copyLine()
 
     strcpy(clipboard, dokumen[cursor]);
 
-    for (int i = cursor; i < jumlahBaris - 1; i++)
-    {
-        strcpy(dokumen[i], dokumen[i + 1]);
-    }
-
-    jumlahBaris--;
-
-    printf("Baris berhasil dipindahkan ke clipboard\n");
+    printf("Baris berhasil dicopy\n");
 }
 
 /* CUT
-   Sama seperti copy tetapi tetap sesuai rancangan
-   memindahkan baris ke clipboard
+   menyalin ke clipboard lalu menghapus dari dokumen
 */
 void cutLine()
 {
@@ -65,7 +89,7 @@ void cutLine()
 }
 
 /* PASTE
-   Menambahkan teks clipboard di bawah cursor
+   menempelkan clipboard di bawah cursor
 */
 void pasteLine()
 {
@@ -77,7 +101,7 @@ void pasteLine()
 
     if (jumlahBaris >= MAX_BARIS)
     {
-        printf("Dokumen sudah penuh\n");
+        printf("Dokumen penuh\n");
         return;
     }
 
@@ -87,6 +111,7 @@ void pasteLine()
     }
 
     strcpy(dokumen[cursor + 1], clipboard);
+
     jumlahBaris++;
 
     printf("Clipboard ditempel di bawah cursor\n");
