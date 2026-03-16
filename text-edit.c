@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "text-edit.h"
 
 #define MAX_BARIS 100
 #define MAX_KARAKTER 200

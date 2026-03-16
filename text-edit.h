@@ -1,5 +1,5 @@
-#ifndef BUFFER_H
-#define BUFFER_H
+#ifndef TEXT_EDIT_H
+#define TEXT_EDIT_H
 
 #define MAX_BARIS 100
 #define MAX_KARAKTER 200
