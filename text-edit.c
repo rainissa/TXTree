@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "text-edit.h"
 
 #define MAX_BARIS 100
 #define MAX_KARAKTER 200
@@ -33,7 +34,11 @@ void tampilkan()
     printf("\n---------------------------------\n");
     printf("1. Tambah baris\n");
     printf("2. Hapus baris\n");
-    printf("3. Keluar\n");
+    printf("3. Edit Baris\n");
+    printf("4. Sisip Baris\n");
+    printf("5. Save File\n");
+    printf("6. Open File\n");
+    printf("7. Keluar\n");
     printf("---------------------------------\n");
 }
 
@@ -46,8 +51,7 @@ void tambahBaris()
         return;
     }
 
-    printf("Masukkan teks: ");
-    getchar(); 
+    printf("Masukkan teks: "); 
     fgets(buffer[jumlahBaris], MAX_KARAKTER, stdin);
 
     buffer[jumlahBaris][strcspn(buffer[jumlahBaris], "\n")] = 0;
@@ -78,25 +82,47 @@ void hapusBaris()
     jumlahBaris = jumlahBaris - 1;
 }
 
-int main()
+void editBaris()
 {
-    int pilih;
+    int nomor;
 
-    do
+    printf("Masukkan nomor baris yang ingin diubah: ");
+    scanf("%d", &nomor);
+    getchar();
+
+    if(nomor < 1 || nomor > jumlahBaris){
+        printf("Baris tidak ditemukan!\n");
+        return;
+    }
+
+    printf("Masukkan teks pengganti: ");
+    fgets(buffer[nomor-1], MAX_KARAKTER, stdin);
+
+    buffer[nomor-1][strcspn(buffer[nomor-1], "\n")] = 0;
+}
+
+void sisipBaris()
+{
+    int posisi, i;
+
+    printf("Masukkan posisi baris: ");
+    scanf("%d", &posisi);
+
+    if(posisi < 1 || posisi > jumlahBaris + 1)
 	{
-        tampilkan();
+        printf("Posisi tidak tersedia!\n");
+        return;
+    }
 
-        printf("Pilih menu: ");
-        scanf("%d", &pilih);
-		getchar();
-		
-        switch(pilih)
-		{
-            case 1: tambahBaris(); break;
-            case 2: hapusBaris(); break;
-        }
+    for(i = jumlahBaris; i >= posisi; i--){
+        strcpy(buffer[i], buffer[i-1]);
+    }
 
-    }while(pilih != 3);
+    printf("Tulis teks baru: ");
+    getchar();
+    fgets(buffer[posisi-1], MAX_KARAKTER, stdin);
 
-    return 0;
+    buffer[posisi-1][strcspn(buffer[posisi-1], "\n")] = 0;
+
+    jumlahBaris = jumlahBaris + 1;
 }
