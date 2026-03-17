@@ -3,6 +3,7 @@
 #include "open-save.h"
 #include "text-edit.h"
 
+// Mengecek apakah file berekstensi .txt
 int cekTxt(char namaFile[])
 {
     int panjang = strlen(namaFile);
