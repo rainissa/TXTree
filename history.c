@@ -3,8 +3,15 @@
 #include "history.h"
 #include "text-edit.h"
 
+// Variabel buffer global dari text-edit.c
+extern char buffer[MAX_ROW][MAX_COL];
+extern int jumlahBaris;
+
 Action undoStack[STACK_SIZE];
-int top = -1;
+int undoTop = -1;
+
+Action redoStack[STACK_SIZE];
+int redoTop = -1;
 
 void pushUndo(int row, int karakter, char c){
 
@@ -34,4 +41,8 @@ void undo(){
     else{
         printf("Undo stack kosong\n");
     }
+}
+
+void redo() {
+    
 }
