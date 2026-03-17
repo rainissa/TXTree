@@ -30,7 +30,7 @@ void copyBlock(int start, int end){
             break;
         }
 
-        strcpy(clipboard[jumlahClipboard], dokumen[i]);
+        strcpy(clipboard[jumlahClipboard], buffer[i]);
         jumlahClipboard++;
     }
 
@@ -49,7 +49,7 @@ void cutBlock(int start, int end){
     int jumlahHapus = end - start + 1;
 
     for (int i = start; i < jumlahBaris - jumlahHapus; i++){
-        strcpy(dokumen[i], dokumen[i + jumlahHapus]);
+        strcpy(buffer[i], buffer[i + jumlahHapus]);
     }
 
     jumlahBaris -= jumlahHapus;
@@ -70,11 +70,11 @@ void pasteBlock(){
     }
 
     for (int i = jumlahBaris - 1; i > cursor; i--){
-        strcpy(dokumen[i + jumlahClipboard], dokumen[i]);
+        strcpy(buffer[i + jumlahClipboard], buffer[i]);
     }
 
     for (int i = 0; i < jumlahClipboard; i++){
-        strcpy(dokumen[cursor + 1 + i], clipboard[i]);
+        strcpy(buffer[cursor + 1 + i], clipboard[i]);
     }
 
     jumlahBaris += jumlahClipboard;
