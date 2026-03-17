@@ -1,7 +1,7 @@
 #ifndef CURSOR_H
 #define CURSOR_H
 
-#define MAX_BARIS 100
+#define MAX_ROW 100
 
 <<<<<<< HEAD
 extern int cursor_row;
