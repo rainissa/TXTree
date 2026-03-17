@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 
 #include "text-edit.h"
@@ -8,33 +7,14 @@
 #include "history.h"
 #include "open-save.h"
 
-/* variabel global untuk clipboard */
-char buffer[MAX_ROW][MAX_COL];
-char clipboard[MAX_COL];
-int cursor = 0;
-
-/* sinkronisasi buffer text-edit ke dokumen clipboard */
-void syncBufferToDokumen() {
-    for(int i = 0; i < jumlahBaris; i++){
-        strcpy(buffer[i], buffer[i]);
-    }
-}
-
-/* sinkronisasi dokumen clipboard ke buffer text-edit */
-void syncDokumenToBuffer() {
-    for(int i = 0; i < jumlahBaris; i++){
-        strcpy(buffer[i],buffer[i]);
-    }
-}
-
-/* tampilan header aplikasi */
+/* tampilan header */
 void tampilkanHeader() {
     printf("=========================================\n");
-    printf("         TxTree Text Editor 🌳\n");
+    printf("         TxTree Text Editor\n");
     printf("=========================================\n");
 }
 
-/* tampilan menu */
+/* menu */
 void tampilkanMenu() {
     printf("\n========== MENU ==========\n");
     printf("1.  Tambah Baris\n");
@@ -43,29 +23,28 @@ void tampilkanMenu() {
     printf("4.  Sisip Baris\n");
     printf("5.  Save File\n");
     printf("6.  Open File\n");
-    printf("7.  Keluar\n");
-    printf("8.  Copy\n");
-    printf("9.  Cut\n");
-    printf("10. Paste\n");
-    printf("11. Undo\n");
-    printf("12. Redo\n");
-    printf("13. Set Cursor\n");
+    printf("7.  Copy\n");
+    printf("8.  Cut\n");
+    printf("9.  Paste\n");
+    printf("10. Undo\n");
+    printf("11. Redo\n");
+    printf("12. Set Cursor\n");
+    printf("13. Keluar\n");
     printf("==========================\n");
 }
 
-/* jeda layar */
 void pauseScreen() {
     printf("\nTekan ENTER untuk lanjut...");
     getchar();
 }
 
-int main(){
-
+int main() {
     int pilihan;
+    int pos;
 
-    while(1){
+    while (1) {
+        system("cls");
 
-        system("cls"); // Windows (kalau Linux ganti "clear")
         tampilkanHeader();
 
         printf("\n=== ISI DOKUMEN ===\n");
@@ -77,7 +56,7 @@ int main(){
         scanf("%d", &pilihan);
         getchar();
 
-        switch(pilihan){
+        switch (pilihan) {
 
             case 1:
                 tambahBaris();
@@ -104,47 +83,40 @@ int main(){
                 break;
 
             case 7:
-                printf("Keluar dari program...\n");
-                exit(0);
-
-            case 8:
-                syncBufferToDokumen();
                 copyLine();
-                syncDokumenToBuffer();
                 printf(">> Copy berhasil\n");
                 break;
 
-            case 9:
-                syncBufferToDokumen();
+            case 8:
                 cutLine();
-                syncDokumenToBuffer();
                 printf(">> Cut berhasil\n");
                 break;
 
-            case 10:
-                syncBufferToDokumen();
+            case 9:
                 pasteLine();
-                syncDokumenToBuffer();
                 printf(">> Paste berhasil\n");
                 break;
 
-            case 11:
+            case 10:
                 undo();
                 printf(">> Undo berhasil\n");
                 break;
 
-            case 12:
+            case 11:
                 redo();
                 printf(">> Redo berhasil\n");
                 break;
 
-            case 13:
+            case 12:
                 printf("Masukkan posisi cursor: ");
-                scanf("%d", &cursor);
+                scanf("%d", &pos);
                 getchar();
-                setCursor(cursor);
-                printf(">> Cursor dipindahkan ke %d\n", cursor);
+                setCursor(pos);
                 break;
+
+            case 13:
+                printf("Keluar...\n");
+                return 0;
 
             default:
                 printf("Menu tidak valid!\n");
@@ -152,6 +124,4 @@ int main(){
 
         pauseScreen();
     }
-
-    return 0;
 }
