@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
-#include "buffer.h"
+#include "text-edit.h"
 #include "open-save.h"
 
+// Mengecek apakah file berekstensi .txt
 int cekTxt(char namaFile[])
 {
     int panjang = strlen(namaFile);
