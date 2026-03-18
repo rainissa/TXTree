@@ -1,23 +1,20 @@
 #ifndef HISTORY_H
 #define HISTORY_H
 
-#include "text-edit.h" // Supaya dapet MAX_KARAKTER
-
-#define STACK_SIZE 100
-
-// Enumerasi untuk membedakan tipe aksi
-typedef enum { EDIT, TAMBAH, HAPUS } ActionType;
+#define STACK_SIZE 10
+#define MAX_ROW 100
+#define MAX_KARAKTER 200
 
 typedef struct {
-    int row;                      // Posisi baris di Array 2D
-    char dataLama[MAX_KARAKTER];  // Teks lama sebelum diubah
-    ActionType tipe;              // Jenis aksi yang dilakukan
-} Action;
+    char buffer[MAX_ROW][MAX_KARAKTER];
+    int jumlahBaris;
+    int cursor_row;
+    int cursor_col;
+} Snapshot;
 
-// Fungsi utama History
-void pushUndo(int row, char *teks, ActionType tipe);
-void undo();
-void redo();
-void clearRedo();
+void pushSnapshot(); // menyimpan kondisi buffer & kursor ke stack undo
+void undo(); // mengembalikan buffer & kursor ke snapshot sebelumnya
+void redo(); // mengembalikan buffer & kursor ke snapshot setelah undo
+void clearRedo(); // menghapus semua redo stack
 
 #endif

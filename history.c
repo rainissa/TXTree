@@ -4,105 +4,148 @@
 #include "cursor.h"
 #include "text-edit.h"
 
-// Variabel buffer global dari text-edit.c
+// Ambil variabel global dari file lain
 extern char buffer[MAX_ROW][MAX_KARAKTER];
 extern int jumlahBaris;
+extern int cursor_row;
+extern int cursor_col;
 
-Action undoStack[STACK_SIZE];
+// Stack undo & redo
+Snapshot undoStack[STACK_SIZE];
 int undoTop = -1;
 
-Action redoStack[STACK_SIZE];
+Snapshot redoStack[STACK_SIZE];
 int redoTop = -1;
 
-void pushUndo(int row, char *teks, ActionType tipe) {
-    if (undoTop < STACK_SIZE - 1) {
-        undoTop++;
-        undoStack[undoTop].row = row;
-        undoStack[undoTop].tipe = tipe;
-        // Salin teks dari Array 2D ke memori Stack
-        strcpy(undoStack[undoTop].dataLama, teks);
-    }
-}
-
+// ======================
+// Clear redo
+// ======================
 void clearRedo() {
     redoTop = -1;
 }
 
-void undo() {
-    if (undoTop >= 0) {
-        Action last = undoStack[undoTop];
+// ======================
+// Push snapshot sebelum edit
+// ======================
+void pushSnapshot() {
+    // setiap edit baru, redo harus dihapus
+    clearRedo();
+
+    // shift stack jika penuh (rolling history)
+    if (undoTop == STACK_SIZE - 1) {
+        for (int i = 0; i < STACK_SIZE - 1; i++) {
+            undoStack[i] = undoStack[i + 1];
+        }
         undoTop--;
+    }
 
-        // ✅ TAMBAHAN: simpan kondisi sekarang ke redo
-        if (redoTop < STACK_SIZE - 1) {
-            redoTop++;
-            redoStack[redoTop].row = last.row;
-            redoStack[redoTop].tipe = last.tipe;
-            strcpy(redoStack[redoTop].dataLama, buffer[last.row]);
-        }
+    undoTop++;
 
-        switch(last.tipe) {
-            case EDIT:
-                // Timpa baris di Array 2D dengan data lama dari Stack
-                strcpy(buffer[last.row], last.dataLama);
-                break;
-            
-            case TAMBAH:
-                // Kebalikan tambah adalah hapus baris terakhir
-                jumlahBaris--;
-                break;
+    undoStack[undoTop].jumlahBaris = jumlahBaris;
+    undoStack[undoTop].cursor_row = cursor_row;
+    undoStack[undoTop].cursor_col = cursor_col;
 
-            case HAPUS:
-                // Kebalikan hapus adalah menggeser baris ke bawah (Insert)
-                for (int i = jumlahBaris; i > last.row; i--) {
-                    strcpy(buffer[i], buffer[i-1]);
-                }
-                strcpy(buffer[last.row], last.dataLama);
-                jumlahBaris++;
-                break;
-        }
-
-        // Pindahkan kursor ke lokasi kejadian agar user tahu apa yang berubah
-        cursor = last.row;
-        printf("Undo berhasil.\n");
-
-    } else {
-
-        printf("Tidak ada yang bisa di-undo.\n");
+    for (int i = 0; i < jumlahBaris; i++) {
+        strcpy(undoStack[undoTop].buffer[i], buffer[i]);
     }
 }
 
-void redo() 
-{
-    if (redoTop >= 0) {
-        Action last = redoStack[redoTop];
-        redoTop--;
-
-        // simpan ke undo lagi (biar bisa undo balik)
-        pushUndo(last.row, buffer[last.row], last.tipe);
-
-        switch(last.tipe) {
-            case EDIT:
-                strcpy(buffer[last.row], last.dataLama);
-                break;
-
-            case TAMBAH:
-                strcpy(buffer[jumlahBaris], last.dataLama);
-                jumlahBaris++;
-                break;
-
-            case HAPUS:
-                for (int i = last.row; i < jumlahBaris - 1; i++) {
-                    strcpy(buffer[i], buffer[i+1]);
-                }
-                jumlahBaris--;
-                break;
-        }
-
-        cursor = last.row;
-        printf("Redo berhasil.\n");
-
-    } else {
-        printf("Tidak ada yang bisa di-redo.\n");
+// ======================
+// Undo
+// ======================
+void undo() {
+    if (undoTop < 0) {
+        printf("\n[!] Tidak ada aksi untuk di-undo.\n");
+        return;
     }
+
+    // Simpan kondisi saat ini ke redo
+    if (redoTop == STACK_SIZE - 1) {
+        for (int i = 0; i < STACK_SIZE - 1; i++) {
+            redoStack[i] = redoStack[i + 1];
+        }
+        redoTop--;
+    }
+    redoTop++;
+
+    redoStack[redoTop].jumlahBaris = jumlahBaris;
+    redoStack[redoTop].cursor_row = cursor_row;
+    redoStack[redoTop].cursor_col = cursor_col;
+    for (int i = 0; i < jumlahBaris; i++) {
+        strcpy(redoStack[redoTop].buffer[i], buffer[i]);
+    }
+
+    // Restore dari undo
+    jumlahBaris = undoStack[undoTop].jumlahBaris;
+    cursor_row = undoStack[undoTop].cursor_row;
+    cursor_col = undoStack[undoTop].cursor_col;
+
+    for (int i = 0; i < jumlahBaris; i++) {
+        strcpy(buffer[i], undoStack[undoTop].buffer[i]);
+    }
+    // Bersihkan sisa baris
+    for (int i = jumlahBaris; i < MAX_ROW; i++) {
+        buffer[i][0] = '\0';
+    }
+
+    // Validasi cursor
+    if (cursor_row >= jumlahBaris && jumlahBaris > 0) cursor_row = jumlahBaris - 1;
+    if (cursor_row < 0) cursor_row = 0;
+    if (cursor_col < 0) cursor_col = 0;
+    int len = (jumlahBaris > 0) ? strlen(buffer[cursor_row]) : 0;
+    if (cursor_col > len) cursor_col = len;
+
+    undoTop--;
+
+    printf("\n[v] Undo berhasil.\n");
+}
+
+// ======================
+// Redo
+// ======================
+void redo() {
+    if (redoTop < 0) {
+        printf("\n[!] Tidak ada aksi untuk di-redo.\n");
+        return;
+    }
+
+    // Simpan kondisi saat ini ke undo tanpa clear redo
+    if (undoTop == STACK_SIZE - 1) {
+        for (int i = 0; i < STACK_SIZE - 1; i++) {
+            undoStack[i] = undoStack[i + 1];
+        }
+        undoTop--;
+    }
+    undoTop++;
+
+    undoStack[undoTop].jumlahBaris = jumlahBaris;
+    undoStack[undoTop].cursor_row = cursor_row;
+    undoStack[undoTop].cursor_col = cursor_col;
+    for (int i = 0; i < jumlahBaris; i++) {
+        strcpy(undoStack[undoTop].buffer[i], buffer[i]);
+    }
+
+    // Restore dari redo
+    jumlahBaris = redoStack[redoTop].jumlahBaris;
+    cursor_row = redoStack[redoTop].cursor_row;
+    cursor_col = redoStack[redoTop].cursor_col;
+
+    for (int i = 0; i < jumlahBaris; i++) {
+        strcpy(buffer[i], redoStack[redoTop].buffer[i]);
+    }
+    // Bersihkan sisa baris
+    for (int i = jumlahBaris; i < MAX_ROW; i++) {
+        buffer[i][0] = '\0';
+    }
+
+    // Validasi cursor
+    if (cursor_row >= jumlahBaris && jumlahBaris > 0) cursor_row = jumlahBaris - 1;
+    if (cursor_row < 0) cursor_row = 0;
+    if (cursor_col < 0) cursor_col = 0;
+    int len = (jumlahBaris > 0) ? strlen(buffer[cursor_row]) : 0;
+    if (cursor_col > len) cursor_col = len;
+
+    redoTop--;
+
+    printf("\n[v] Redo berhasil.\n");
 }
