@@ -3,11 +3,19 @@
 
 #define MAX_BARIS 100
 
-// extern supaya variabel ini bisa dibaca di main.c dan text-edit.c
-extern int cursor; 
+// cursor baris & kolom
+extern int cursor_row;
+extern int cursor_col;
 
+// validasi
 int isCursorValid();
+
+// navigasi baris
 void moveUp();
 void moveDown();
+
+// navigasi kolom
+void moveLeft();
+void moveRight();
 
 #endif
