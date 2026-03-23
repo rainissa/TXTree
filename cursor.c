@@ -51,3 +51,15 @@ void moveRight() {
         cursor_col++;
     }
 }
+
+void setCursor(int row, int col) {
+    if (row >= 0 && row < jumlahBaris) {
+        cursor_row = row;
+
+        int panjang = strlen(buffer[cursor_row]);
+        if (col >= 0 && col <= panjang)
+            cursor_col = col;
+        else
+            cursor_col = panjang;
+    }
+}

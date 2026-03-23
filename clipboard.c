@@ -7,20 +7,6 @@
 char clipboard[MAX_CLIPBOARD_ROW][MAX_KARAKTER];
 int jumlahClipboard = 0;
 
-/* mengatur cursor */
-void setCursor(int row, int col) {
-    if (row >= 0 && row < jumlahBaris) {
-        cursor_row = row;
-        int len = strlen(buffer[cursor_row]);
-        if (col < 0) col = 0;
-        if (col > len) col = len;
-        cursor_col = col;
-        printf("Cursor di baris %d kolom %d\n", cursor_row, cursor_col);
-    } else {
-        printf("Posisi cursor tidak valid\n");
-    }
-}
-
 /* COPY BLOK BARIS */
 void copyBlock(int start, int end){
     if (start < 0 || end >= jumlahBaris || start > end){

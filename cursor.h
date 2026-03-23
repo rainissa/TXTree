@@ -10,6 +10,9 @@ extern int cursor_col;
 // validasi
 int isCursorValid();
 
+//inisiasi
+void setCursor(int row, int col);
+
 // navigasi baris
 void moveUp();
 void moveDown();
