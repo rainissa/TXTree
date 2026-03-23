@@ -51,6 +51,25 @@ void pushSnapshot() {
 }
 
 // ======================
+// Helper restore snapshot
+// ======================
+void restoreSnapshot(Snapshot *snap) {
+    jumlahBaris = snap->jumlahBaris;
+    cursor_row = snap->cursor_row;
+    cursor_col = snap->cursor_col;
+
+    for (int i = 0; i < jumlahBaris; i++) {
+        strcpy(buffer[i], snap->buffer[i]);
+    }
+    // Bersihkan sisa baris
+    for (int i = jumlahBaris; i < MAX_ROW; i++) {
+        buffer[i][0] = '\0';
+    }
+
+    isCursorValid();
+}
+
+// ======================
 // Undo
 // ======================
 void undo() {
@@ -76,25 +95,7 @@ void undo() {
     }
 
     // Restore dari undo
-    jumlahBaris = undoStack[undoTop].jumlahBaris;
-    cursor_row = undoStack[undoTop].cursor_row;
-    cursor_col = undoStack[undoTop].cursor_col;
-
-    for (int i = 0; i < jumlahBaris; i++) {
-        strcpy(buffer[i], undoStack[undoTop].buffer[i]);
-    }
-    // Bersihkan sisa baris
-    for (int i = jumlahBaris; i < MAX_ROW; i++) {
-        buffer[i][0] = '\0';
-    }
-
-    // Validasi cursor
-    if (cursor_row >= jumlahBaris && jumlahBaris > 0) cursor_row = jumlahBaris - 1;
-    if (cursor_row < 0) cursor_row = 0;
-    if (cursor_col < 0) cursor_col = 0;
-    int len = (jumlahBaris > 0) ? strlen(buffer[cursor_row]) : 0;
-    if (cursor_col > len) cursor_col = len;
-
+    restoreSnapshot(&undoStack[undoTop]);
     undoTop--;
 
     printf("\n[v] Undo berhasil.\n");
@@ -126,25 +127,7 @@ void redo() {
     }
 
     // Restore dari redo
-    jumlahBaris = redoStack[redoTop].jumlahBaris;
-    cursor_row = redoStack[redoTop].cursor_row;
-    cursor_col = redoStack[redoTop].cursor_col;
-
-    for (int i = 0; i < jumlahBaris; i++) {
-        strcpy(buffer[i], redoStack[redoTop].buffer[i]);
-    }
-    // Bersihkan sisa baris
-    for (int i = jumlahBaris; i < MAX_ROW; i++) {
-        buffer[i][0] = '\0';
-    }
-
-    // Validasi cursor
-    if (cursor_row >= jumlahBaris && jumlahBaris > 0) cursor_row = jumlahBaris - 1;
-    if (cursor_row < 0) cursor_row = 0;
-    if (cursor_col < 0) cursor_col = 0;
-    int len = (jumlahBaris > 0) ? strlen(buffer[cursor_row]) : 0;
-    if (cursor_col > len) cursor_col = len;
-
+    restoreSnapshot(&redoStack[redoTop]);
     redoTop--;
 
     printf("\n[v] Redo berhasil.\n");
