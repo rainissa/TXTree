@@ -7,25 +7,23 @@
 #include "history.h"
 #include "open-save.h"
 
-/* tampilan header */
 void tampilkanHeader() {
     printf("=========================================\n");
     printf("         TxTree Text Editor\n");
     printf("=========================================\n");
 }
 
-/* menu */
 void tampilkanMenu() {
     printf("\n========== MENU ==========\n");
-    printf("1.  Tambah Baris\n");
-    printf("2.  Hapus Baris\n");
-    printf("3.  Edit Baris\n");
-    printf("4.  Sisip Baris\n");
-    printf("5.  Save File\n");
-    printf("6.  Open File\n");
-    printf("7.  Copy\n");
-    printf("8.  Cut\n");
-    printf("9.  Paste\n");
+    printf("1. Tambah Baris\n");
+    printf("2. Hapus Baris\n");
+    printf("3. Edit Baris\n");
+    printf("4. Sisip Baris\n");
+    printf("5. Save File\n");
+    printf("6. Open File\n");
+    printf("7. Copy (cursor)\n");
+    printf("8. Cut (cursor)\n");
+    printf("9. Paste\n");
     printf("10. Undo\n");
     printf("11. Redo\n");
     printf("12. Set Cursor\n");
@@ -43,106 +41,70 @@ int main() {
         tampilkanHeader();
 
         printf("\n=== ISI DOKUMEN ===\n");
-        tampilkan();
+        tampilkan();  // nanti diperbaiki supaya ada cursor
+
+        printf("\nCursor di baris: %d\n", cursor_row);
 
         tampilkanMenu();
 
         printf("Pilih menu: ");
-        scanf("%d", &pilihan);
+        if (scanf("%d", &pilihan) != 1) {
+            printf("Input tidak valid!\n");
+            while(getchar() != '\n');
+            continue;
+        }
         getchar();
 
         switch (pilihan) {
 
-            case 1:{
-                tambahBaris();
-                break;
-            }
+            case 1: tambahBaris(); break;
+            case 2: hapusBaris(); break;
+            case 3: editBaris(); break;
+            case 4: sisipBaris(); break;
+            case 5: saveFile(); break;
+            case 6: openFile(); break;
 
-            case 2:{
-                hapusBaris();
-                break;
-            }
-
-            case 3:{
-                editBaris();
-                break;
-            }
-
-            case 4:{
-                sisipBaris();
-                break;
-            }
-
-            case 5:{
-                saveFile();
-                break;
-            }
-
-            case 6:{
-                openFile();
-                break;
-            }
-
-            case 7:{
-                int start, end;
-                printf("Masukkan baris awal: ");
-                scanf("%d", &start);
-                printf("Masukkan baris akhir: ");
-                scanf("%d", &end);
-                getchar();
-
-                copyBlock(start, end);
+            case 7:
+                copyLine(cursor_row);
                 printf(">> Copy berhasil\n");
                 break;
-            }
 
-            case 8:{
-                int start, end;
-                printf("Masukkan baris awal: ");
-                scanf("%d", &start);
-                printf("Masukkan baris akhir: ");
-                scanf("%d", &end);
-                getchar();
-
-                cutBlock(start, end);
+            case 8:
+                cutLine(cursor_row);
                 printf(">> Cut berhasil\n");
                 break;
-            }
 
-            case 9:{
-                pasteBlock();
+            case 9:
+                pasteLine(cursor_row);
                 printf(">> Paste berhasil\n");
                 break;
-            }
 
-            case 10:{
+            case 10:
                 undo();
                 printf(">> Undo berhasil\n");
                 break;
-            }
 
-            case 11:{
+            case 11:
                 redo();
                 printf(">> Redo berhasil\n");
                 break;
-            }
 
-            case 12:{
+            case 12:
                 printf("Masukkan posisi cursor: ");
                 scanf("%d", &pos);
                 getchar();
-                setCursor(pos, 0);
+
+                if (pos >= 0 && pos < jumlahBaris)
+                    setCursor(pos, 0);
+                else
+                    printf("Posisi tidak valid!\n");
                 break;
-            }
 
-            case 13:{
-                printf("Keluar...\n");
+            case 13:
                 return 0;
-            }
 
-            default:{
+            default:
                 printf("Menu tidak valid!\n");
-            }
         }
 
         pauseScreen();
