@@ -25,7 +25,6 @@ void pauseScreen()
 
 void tampilkan()
 {
-    clearScreen();
     printf("\n====== TEXT EDITOR ======\n\n");
 
     for(i = 0; i < jumlahBaris; i++)
@@ -92,8 +91,14 @@ void hapusBaris()
 
     jumlahBaris = jumlahBaris - 1;
 
-    if (cursor_row >= jumlahBaris) cursor_row = jumlahBaris - 1;
-    if (cursor_row < 0) cursor_row = 0;
+    if (jumlahBaris == 0)
+    {
+        cursor_row = 0;
+    }
+    else if (cursor_row >= jumlahBaris)
+    {
+        cursor_row = jumlahBaris - 1;
+    }
     cursor_col = 0;
 }
 
@@ -107,6 +112,7 @@ void editBaris()
 
     if(nomor < 1 || nomor > jumlahBaris){
         printf("Baris tidak ditemukan!\n");
+        pauseScreen();
         return;
     }
 
@@ -125,9 +131,16 @@ void editBaris()
 void sisipBaris()
 {
     int posisi, i;
+    if(jumlahBaris >= MAX_ROW)
+    {
+        printf("Buffer penuh!\n");
+        pauseScreen();
+        return;
+    }
 
     printf("Masukkan posisi baris: ");
     scanf("%d", &posisi);
+    getchar();
 
     if(posisi < 1 || posisi > jumlahBaris + 1)
 	{

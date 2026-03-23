@@ -8,7 +8,30 @@ int cursor_col = 0;
 
 // validasi cursor baris
 int isCursorValid() {
-    return (cursor_row >= 0 && cursor_row < jumlahBaris);
+
+     if (jumlahBaris == 0) {
+        cursor_row = 0;
+        cursor_col = 0;
+        return 1;
+    }
+
+    // validasi baris
+    if (cursor_row < 0)
+        cursor_row = 0;
+
+    if (cursor_row >= jumlahBaris)
+        cursor_row = jumlahBaris - 1;
+
+    // validasi kolom
+    int panjang = strlen(buffer[cursor_row]);
+
+    if (cursor_col < 0)
+        cursor_col = 0;
+
+    if (cursor_col > panjang)
+        cursor_col = panjang;
+
+    return 1; 
 }
 
 // ======================
@@ -16,24 +39,13 @@ int isCursorValid() {
 // ======================
 
 void moveUp() {
-    if (cursor_row > 0) {
-        cursor_row--;
-
-        // biar kolom gak keluar dari panjang string
-        if (cursor_col > strlen(buffer[cursor_row])) {
-            cursor_col = strlen(buffer[cursor_row]);
-        }
-    }
+    cursor_row--;
+    isCursorValid();
 }
 
 void moveDown() {
-    if (cursor_row < jumlahBaris - 1) {
-        cursor_row++;
-
-        if (cursor_col > strlen(buffer[cursor_row])) {
-            cursor_col = strlen(buffer[cursor_row]);
-        }
-    }
+    cursor_row++;
+    isCursorValid();
 }
 
 // ======================
@@ -41,25 +53,17 @@ void moveDown() {
 // ======================
 
 void moveLeft() {
-    if (cursor_col > 0) {
-        cursor_col--;
-    }
+    cursor_col--;
+    isCursorValid();
 }
 
 void moveRight() {
-    if (cursor_col < strlen(buffer[cursor_row])) {
-        cursor_col++;
-    }
+    cursor_col++;
+    isCursorValid();
 }
 
 void setCursor(int row, int col) {
-    if (row >= 0 && row < jumlahBaris) {
-        cursor_row = row;
-
-        int panjang = strlen(buffer[cursor_row]);
-        if (col >= 0 && col <= panjang)
-            cursor_col = col;
-        else
-            cursor_col = panjang;
-    }
+    cursor_row = row;
+    cursor_col = col;
+    isCursorValid();
 }

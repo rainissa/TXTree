@@ -2,7 +2,7 @@
 #include <string.h>
 #include "text-edit.h"
 #include "open-save.h"
-#include "text-edit.h"
+#include "cursor.h"
 
 // Mengecek apakah file berekstensi .txt
 int cekTxt(char namaFile[])
@@ -15,9 +15,9 @@ int cekTxt(char namaFile[])
     }
 
     if(namaFile[panjang-4] == '.' &&
-       namaFile[panjang-3] == 't' &&
-       namaFile[panjang-2] == 'x' &&
-       namaFile[panjang-1] == 't')
+        (namaFile[panjang-3] == 't' || namaFile[panjang-3] == 'T') &&
+        (namaFile[panjang-2] == 'x' || namaFile[panjang-2] == 'X') &&
+        (namaFile[panjang-1] == 't' || namaFile[panjang-1] == 'T'))
     {
         return 1;
     }
@@ -37,26 +37,32 @@ void openFile()
     if(cekTxt(namaFile) == 0)
     {
         printf("File harus berekstensi .txt\n");
+        pauseScreen();
         return;
     }
     file = fopen(namaFile, "r");
     if(file == NULL)
     {
         printf("File tidak ditemukan\n");
+        pauseScreen();
         return;
     }
     jumlahBaris = 0;
 
-    while(fgets(buffer[jumlahBaris], MAX_KARAKTER, file) != NULL)
-    {
+    while(jumlahBaris < MAX_ROW && fgets(buffer[jumlahBaris], MAX_KARAKTER, file) != NULL)
+    {   
         buffer[jumlahBaris][strcspn(buffer[jumlahBaris], "\n")] = '\0';
-        jumlahBaris++;
-        if(jumlahBaris >= MAX_ROW)
-        {
-            break;
-        }
+        jumlahBaris = jumlahBaris + 1;
     }
     fclose(file);
+    cursor_row = 0;
+    cursor_col = 0;
+
+    if(jumlahBaris == MAX_ROW)
+    {
+        printf("File terlalu besar, sebagian tidak dimuat!\n");
+        pauseScreen();
+    }
     printf("File berhasil dibuka\n");
 }
 
@@ -73,12 +79,14 @@ void saveFile()
     if(cekTxt(namaFile) == 0)
     {
         printf("Nama file harus .txt\n");
+        pauseScreen();
         return;
     }
     file = fopen(namaFile, "w");
     if(file == NULL)
     {
         printf("Gagal menyimpan file\n");
+        pauseScreen();
         return;
     }
     for(i = 0; i < jumlahBaris; i++)
