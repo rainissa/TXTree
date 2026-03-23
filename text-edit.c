@@ -25,22 +25,10 @@ void pauseScreen()
 
 void tampilkan()
 {
-    printf("\n====== TEXT EDITOR ======\n\n");
-
     for(i = 0; i < jumlahBaris; i++)
 	{
         printf("%2d | %s\n", i+1, buffer[i]);
     }
-
-    printf("\n---------------------------------\n");
-    printf("1. Tambah baris\n");
-    printf("2. Hapus baris\n");
-    printf("3. Edit Baris\n");
-    printf("4. Sisip Baris\n");
-    printf("5. Save File\n");
-    printf("6. Open File\n");
-    printf("7. Keluar\n");
-    printf("---------------------------------\n");
 }
 
 void tambahBaris()
@@ -145,6 +133,7 @@ void sisipBaris()
     if(posisi < 1 || posisi > jumlahBaris + 1)
 	{
         printf("Posisi tidak tersedia!\n");
+        pauseScreen();
         return;
     }
 
@@ -156,7 +145,6 @@ void sisipBaris()
     }
 
     printf("Tulis teks baru: ");
-    getchar();
     fgets(buffer[posisi-1], MAX_KARAKTER, stdin);
 
     buffer[posisi-1][strcspn(buffer[posisi-1], "\n")] = 0;
