@@ -39,13 +39,13 @@ void cutLine(){
         return;
     }
 
-    pushSnapshot();
-    clearRedo();
-
     int len = strlen(buffer[cursor_row]);
 
     int col = cursor_col;
     if (col > len) col = len;
+
+    pushSnapshot();
+    clearRedo();
 
     strncpy(clipboard, buffer[cursor_row] + col, MAX_KARAKTER - 1);
     clipboard[MAX_KARAKTER - 1] = '\0';
@@ -66,26 +66,25 @@ void pasteLine(){
         return;
     }
 
-    pushSnapshot();
-    clearRedo();
-
-    char temp[MAX_KARAKTER];
-
     int len = strlen(buffer[cursor_row]);
 
     int col = cursor_col;
     if (col > len) col = len;
 
+    char temp[MAX_KARAKTER];
+
     strncpy(temp, buffer[cursor_row] + col, MAX_KARAKTER - 1);
     temp[MAX_KARAKTER - 1] = '\0';
 
-    int kiri = col;
-    int total = kiri + strlen(clipboard) + strlen(temp) + 1;
+   int total = col + strlen(clipboard) + strlen(temp) + 1;
 
     if (total > MAX_KARAKTER){
         printf("Paste gagal: melebihi kapasitas baris\n");
         return;
     }
+
+    pushSnapshot();
+    clearRedo();
 
     buffer[cursor_row][col] = '\0';
 
