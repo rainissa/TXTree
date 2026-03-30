@@ -18,9 +18,13 @@ void copyLine(){
     }
 
     int len = strlen(buffer[cursor_row]);
-    if (cursor_col > len) cursor_col = len;
 
-    strcpy(clipboard, buffer[cursor_row] + cursor_col);
+    int col = cursor_col;
+    if (col > len) col = len;
+
+    // SAFE COPY
+    strncpy(clipboard, buffer[cursor_row] + col, MAX_KARAKTER - 1);
+    clipboard[MAX_KARAKTER - 1] = '\0';
 
     printf("Copy berhasil\n");
 }
@@ -40,17 +44,21 @@ void cutLine(){
     clearRedo();
 
     int len = strlen(buffer[cursor_row]);
-    if (cursor_col > len) cursor_col = len;
 
-    strcpy(clipboard, buffer[cursor_row] + cursor_col);
+    int col = cursor_col;
+    if (col > len) col = len;
 
-    buffer[cursor_row][cursor_col] = '\0';
+    // SAFE COPY
+    strncpy(clipboard, buffer[cursor_row] + col, MAX_KARAKTER - 1);
+    clipboard[MAX_KARAKTER - 1] = '\0';
+
+    buffer[cursor_row][col] = '\0';
 
     printf("Cut berhasil\n");
 }
 
 void pasteLine(){
-    if (strlen(clipboard) == 0){
+    if (clipboard[0] == '\0'){
         printf("Clipboard kosong\n");
         return;
     }
@@ -66,16 +74,34 @@ void pasteLine(){
     char temp[MAX_KARAKTER];
 
     int len = strlen(buffer[cursor_row]);
-    if (cursor_col > len) cursor_col = len;
 
-    strcpy(temp, buffer[cursor_row] + cursor_col);
+    int col = cursor_col;
+    if (col > len) col = len;
 
-    buffer[cursor_row][cursor_col] = '\0';
+    // Simpan bagian kanan TANPA mengubah buffer dulu
+    strncpy(temp, buffer[cursor_row] + col, MAX_KARAKTER - 1);
+    temp[MAX_KARAKTER - 1] = '\0';
 
-    strcat(buffer[cursor_row], clipboard);
-    strcat(buffer[cursor_row], temp);
+    // VALIDASI DULU (SEBELUM MODIFIKASI BUFFER)
+    int kiri = col;
+    int total = kiri + strlen(clipboard) + strlen(temp) + 1;
 
-    cursor_col += strlen(clipboard);
+    if (total > MAX_KARAKTER){
+        printf("Paste gagal: melebihi kapasitas baris\n");
+        return;
+    }
+
+    // Baru potong setelah aman
+    buffer[cursor_row][col] = '\0';
+
+    // SAFE CONCAT
+    int sisa = MAX_KARAKTER - strlen(buffer[cursor_row]) - 1;
+    strncat(buffer[cursor_row], clipboard, sisa);
+
+    sisa = MAX_KARAKTER - strlen(buffer[cursor_row]) - 1;
+    strncat(buffer[cursor_row], temp, sisa);
+
+    cursor_col = col + strlen(clipboard);
 
     printf("Paste berhasil\n");
 }

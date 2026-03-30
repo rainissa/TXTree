@@ -36,13 +36,16 @@ int main() {
     int pilihan;
     int pos;
 
+    // ✅ INISIALISASI WAJIB
+    clipboard[0] = '\0';
+
     while (1) {
         system("cls");
 
         tampilkanHeader();
 
         printf("\n=== ISI DOKUMEN ===\n");
-        tampilkan();  // nanti diperbaiki supaya ada cursor
+        tampilkan();
 
         printf("\nCursor di baris: %d, kolom: %d\n", cursor_row, cursor_col);
 
@@ -52,6 +55,7 @@ int main() {
         if (scanf("%d", &pilihan) != 1) {
             printf("Input tidak valid!\n");
             while(getchar() != '\n');
+            pauseScreen();
             continue;
         }
         getchar();
@@ -83,20 +87,12 @@ int main() {
                 break;
 
             case 7:
-                if (jumlahBaris == 0){
-                    printf("Dokumen kosong!\n");
-                } else {
-                    copyLine();
-                    printf(">> Copy berhasil\n");
-                } break;
+                copyLine();   // ✅ tidak perlu cek lagi
+                break;
 
             case 8:
-                if (jumlahBaris == 0){
-                printf("Dokumen kosong!\n");
-                } else {
-                    cutLine();
-                    printf(">> Cut berhasil\n");
-                } break;
+                cutLine();    // ✅ tidak perlu cek lagi
+                break;
 
             case 9:
                 pasteLine();
@@ -104,12 +100,10 @@ int main() {
 
             case 10:
                 undo();
-                printf(">> Undo berhasil\n");
                 break;
 
             case 11:
                 redo();
-                printf(">> Redo berhasil\n");
                 break;
 
             case 12:
@@ -119,14 +113,22 @@ int main() {
                 }
 
                 printf("Masukkan baris cursor: ");
-                scanf("%d", &pos);
+                if (scanf("%d", &pos) != 1){
+                    printf("Input tidak valid!\n");
+                    while(getchar() != '\n');
+                    break;
+                }
                 getchar();
 
                 if (pos >= 0 && pos < jumlahBaris){
                     int col;
 
                     printf("Masukkan kolom cursor: ");
-                    scanf("%d", &col);
+                    if (scanf("%d", &col) != 1){
+                        printf("Input tidak valid!\n");
+                        while(getchar() != '\n');
+                        break;
+                    }
                     getchar();
 
                     int len = strlen(buffer[pos]);
@@ -138,7 +140,8 @@ int main() {
                 }
                 else {
                     printf("Posisi tidak valid!\n");
-                } break;
+                } 
+                break;
 
             case 13:
                 return 0;
