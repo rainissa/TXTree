@@ -22,7 +22,6 @@ void copyLine(){
     int col = cursor_col;
     if (col > len) col = len;
 
-    // SAFE COPY
     strncpy(clipboard, buffer[cursor_row] + col, MAX_KARAKTER - 1);
     clipboard[MAX_KARAKTER - 1] = '\0';
 
@@ -48,7 +47,6 @@ void cutLine(){
     int col = cursor_col;
     if (col > len) col = len;
 
-    // SAFE COPY
     strncpy(clipboard, buffer[cursor_row] + col, MAX_KARAKTER - 1);
     clipboard[MAX_KARAKTER - 1] = '\0';
 
@@ -78,11 +76,9 @@ void pasteLine(){
     int col = cursor_col;
     if (col > len) col = len;
 
-    // Simpan bagian kanan TANPA mengubah buffer dulu
     strncpy(temp, buffer[cursor_row] + col, MAX_KARAKTER - 1);
     temp[MAX_KARAKTER - 1] = '\0';
 
-    // VALIDASI DULU (SEBELUM MODIFIKASI BUFFER)
     int kiri = col;
     int total = kiri + strlen(clipboard) + strlen(temp) + 1;
 
@@ -91,10 +87,8 @@ void pasteLine(){
         return;
     }
 
-    // Baru potong setelah aman
     buffer[cursor_row][col] = '\0';
 
-    // SAFE CONCAT
     int sisa = MAX_KARAKTER - strlen(buffer[cursor_row]) - 1;
     strncat(buffer[cursor_row], clipboard, sisa);
 
