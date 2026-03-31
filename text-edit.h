@@ -1,13 +1,7 @@
 #ifndef TEXT_EDIT_H
 #define TEXT_EDIT_H
 
-#ifndef MAX_ROW
-#define MAX_ROW 100
-#endif
-
-#ifndef MAX_KARAKTER
-#define MAX_KARAKTER 200
-#endif
+#include "config.h"
 
 extern char buffer[MAX_ROW][MAX_KARAKTER];
 extern int jumlahBaris;

@@ -3,6 +3,7 @@
 #include "history.h"
 #include "cursor.h"
 #include "text-edit.h"
+#include "config.h"
 
 // Ambil variabel global dari file lain
 extern char buffer[MAX_ROW][MAX_KARAKTER];

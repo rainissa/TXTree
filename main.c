@@ -6,6 +6,7 @@
 #include "cursor.h"
 #include "history.h"
 #include "open-save.h"
+#include "config.h"
 
 void tampilkanHeader() {
     printf("=========================================\n");

@@ -3,6 +3,7 @@
 #include "clipboard.h"
 #include "cursor.h"
 #include "history.h"
+#include "config.h"
 
 char clipboard[MAX_CLIPBOARD_ROW][MAX_KARAKTER];
 int jumlahClipboard = 0;

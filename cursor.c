@@ -1,6 +1,7 @@
 #include "cursor.h"
 #include "text-edit.h"
 #include <string.h>
+#include "config.h"
 
 // inisialisasi
 int cursor_row = 0;
