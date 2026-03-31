@@ -1,7 +1,7 @@
 #ifndef CURSOR_H
 #define CURSOR_H
 
-#define MAX_ROW 100
+#include "config.h"
 
 // cursor baris & kolom
 extern int cursor_row;

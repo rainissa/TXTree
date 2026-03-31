@@ -3,7 +3,7 @@
 #include "clipboard.h"
 #include "cursor.h"
 #include "history.h"
-#include "text-edit.h"
+#include "config.h"
 
 char clipboard[MAX_KARAKTER];
 

@@ -4,9 +4,7 @@
 #include "text-edit.h"
 #include "cursor.h"
 #include "history.h"
-
-#define MAX_ROW 100
-#define MAX_KARAKTER 200
+#include "config.h"
 
 char buffer[MAX_ROW][MAX_KARAKTER];
 int jumlahBaris = 0;

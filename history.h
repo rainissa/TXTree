@@ -1,9 +1,7 @@
 #ifndef HISTORY_H
 #define HISTORY_H
 
-#define STACK_SIZE 10
-#define MAX_ROW 100
-#define MAX_KARAKTER 200
+#include "config.h"
 
 typedef struct {
     char buffer[MAX_ROW][MAX_KARAKTER];
