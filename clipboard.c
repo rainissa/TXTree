@@ -3,6 +3,7 @@
 #include "clipboard.h"
 #include "cursor.h"
 #include "history.h"
+#include "text-edit.h"
 
 char clipboard[MAX_KARAKTER];
 
@@ -18,6 +19,11 @@ void copyLine(){
     }
 
     int len = strlen(buffer[cursor_row]);
+
+    if (len == 0){
+        printf("Baris kosong, tidak ada yang bisa dicopy\n");
+        return;
+    }
 
     int col = cursor_col;
     if (col > len) col = len;
@@ -41,6 +47,11 @@ void cutLine(){
 
     int len = strlen(buffer[cursor_row]);
 
+    if (len == 0){
+        printf("Baris kosong, tidak ada yang bisa dicut\n");
+        return;
+    }
+
     int col = cursor_col;
     if (col > len) col = len;
 
@@ -51,6 +62,8 @@ void cutLine(){
     clipboard[MAX_KARAKTER - 1] = '\0';
 
     buffer[cursor_row][col] = '\0';
+
+    cursor_col = col;
 
     printf("Cut berhasil\n");
 }
@@ -71,14 +84,18 @@ void pasteLine(){
     int col = cursor_col;
     if (col > len) col = len;
 
+    if (len >= MAX_KARAKTER - 1){
+        printf("Baris sudah penuh\n");
+        return;
+    }
+
     char temp[MAX_KARAKTER];
 
     strncpy(temp, buffer[cursor_row] + col, MAX_KARAKTER - 1);
     temp[MAX_KARAKTER - 1] = '\0';
 
-   int total = col + strlen(clipboard) + strlen(temp) + 1;
-
-    if (total > MAX_KARAKTER){
+    int total = strlen(buffer[cursor_row]) + strlen(clipboard);
+    if (total >= MAX_KARAKTER){
         printf("Paste gagal: melebihi kapasitas baris\n");
         return;
     }
