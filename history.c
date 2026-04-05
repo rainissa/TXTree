@@ -26,48 +26,56 @@ void clearRedo() {
 }
 
 // ======================
-// Push snapshot sebelum edit
+// Helper: simpan state saat ini ke stack
 // ======================
-void pushSnapshot() {
-    // setiap edit baru, redo harus dihapus
-    clearRedo();
-
-    // shift stack jika penuh (rolling history)
-    if (undoTop == STACK_SIZE - 1) {
+static void saveToStack(Snapshot *stack, int *top) {
+    // shift rolling jika stack penuh
+    if (*top == STACK_SIZE - 1) {
         for (int i = 0; i < STACK_SIZE - 1; i++) {
-            undoStack[i] = undoStack[i + 1];
+            stack[i] = stack[i + 1];
         }
-        undoTop--;
+        (*top)--;
     }
 
-    undoTop++;
+    (*top)++;
+    stack[*top].jumlahBaris = jumlahBaris;
+    stack[*top].cursor_row  = cursor_row;
+    stack[*top].cursor_col  = cursor_col;
 
-    undoStack[undoTop].jumlahBaris = jumlahBaris;
-    undoStack[undoTop].cursor_row = cursor_row;
-    undoStack[undoTop].cursor_col = cursor_col;
-
-    for (int i = 0; i < jumlahBaris; i++) {
-        strcpy(undoStack[undoTop].buffer[i], buffer[i]);
+    for (int i = 0; i < MAX_ROW; i++) {
+        if (i < jumlahBaris)
+            strcpy(stack[*top].buffer[i], buffer[i]);
+        else
+            stack[*top].buffer[i][0] = '\0';
     }
 }
 
 // ======================
-// Helper restore snapshot
+// Helper: restore snapshot ke buffer aktif
 // ======================
-void restoreSnapshot(Snapshot *snap) {
+static void restoreSnapshot(Snapshot *snap) {
     jumlahBaris = snap->jumlahBaris;
-    cursor_row = snap->cursor_row;
-    cursor_col = snap->cursor_col;
+    cursor_row  = snap->cursor_row;
+    cursor_col  = snap->cursor_col;
 
     for (int i = 0; i < jumlahBaris; i++) {
         strcpy(buffer[i], snap->buffer[i]);
     }
-    // Bersihkan sisa baris
+
+    // bersihkan sisa baris
     for (int i = jumlahBaris; i < MAX_ROW; i++) {
         buffer[i][0] = '\0';
     }
 
     isCursorValid();
+}
+
+// ======================
+// Push snapshot sebelum edit
+// ======================
+void pushSnapshot() {
+    saveToStack(undoStack, &undoTop);
+    clearRedo();
 }
 
 // ======================
@@ -79,23 +87,7 @@ void undo() {
         return;
     }
 
-    // Simpan kondisi saat ini ke redo
-    if (redoTop == STACK_SIZE - 1) {
-        for (int i = 0; i < STACK_SIZE - 1; i++) {
-            redoStack[i] = redoStack[i + 1];
-        }
-        redoTop--;
-    }
-    redoTop++;
-
-    redoStack[redoTop].jumlahBaris = jumlahBaris;
-    redoStack[redoTop].cursor_row = cursor_row;
-    redoStack[redoTop].cursor_col = cursor_col;
-    for (int i = 0; i < jumlahBaris; i++) {
-        strcpy(redoStack[redoTop].buffer[i], buffer[i]);
-    }
-
-    // Restore dari undo
+    saveToStack(redoStack, &redoTop);
     restoreSnapshot(&undoStack[undoTop]);
     undoTop--;
 
@@ -111,23 +103,7 @@ void redo() {
         return;
     }
 
-    // Simpan kondisi saat ini ke undo tanpa clear redo
-    if (undoTop == STACK_SIZE - 1) {
-        for (int i = 0; i < STACK_SIZE - 1; i++) {
-            undoStack[i] = undoStack[i + 1];
-        }
-        undoTop--;
-    }
-    undoTop++;
-
-    undoStack[undoTop].jumlahBaris = jumlahBaris;
-    undoStack[undoTop].cursor_row = cursor_row;
-    undoStack[undoTop].cursor_col = cursor_col;
-    for (int i = 0; i < jumlahBaris; i++) {
-        strcpy(undoStack[undoTop].buffer[i], buffer[i]);
-    }
-
-    // Restore dari redo
+    saveToStack(undoStack, &undoTop);
     restoreSnapshot(&redoStack[redoTop]);
     redoTop--;
 

@@ -1,19 +1,19 @@
+#include <string.h>
 #include "cursor.h"
 #include "text-edit.h"
-#include <string.h>
-#include "config.h"
 
 // inisialisasi
 int cursor_row = 0;
 int cursor_col = 0;
 
-// validasi cursor baris
+// validasi & sanitasi posisi cursor
+// return 0 jika dokumen kosong, return 1 jika valid
 int isCursorValid() {
 
-     if (jumlahBaris == 0) {
+    if (jumlahBaris == 0) {
         cursor_row = 0;
         cursor_col = 0;
-        return 1;
+        return 0;
     }
 
     // validasi baris
@@ -32,35 +32,7 @@ int isCursorValid() {
     if (cursor_col > panjang)
         cursor_col = panjang;
 
-    return 1; 
-}
-
-// ======================
-// NAVIGASI BARIS
-// ======================
-
-void moveUp() {
-    cursor_row--;
-    isCursorValid();
-}
-
-void moveDown() {
-    cursor_row++;
-    isCursorValid();
-}
-
-// ======================
-// NAVIGASI KOLOM
-// ======================
-
-void moveLeft() {
-    cursor_col--;
-    isCursorValid();
-}
-
-void moveRight() {
-    cursor_col++;
-    isCursorValid();
+    return 1;
 }
 
 void setCursor(int row, int col) {

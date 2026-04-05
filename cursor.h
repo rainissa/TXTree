@@ -1,24 +1,15 @@
 #ifndef CURSOR_H
 #define CURSOR_H
 
-#include "config.h"
-
 // cursor baris & kolom
 extern int cursor_row;
 extern int cursor_col;
 
-// validasi
+// validasi & sanitasi posisi cursor
+// return 0 jika dokumen kosong, return 1 jika valid
 int isCursorValid();
 
-//inisiasi
+// set cursor ke posisi tertentu
 void setCursor(int row, int col);
-
-// navigasi baris
-void moveUp();
-void moveDown();
-
-// navigasi kolom
-void moveLeft();
-void moveRight();
 
 #endif
