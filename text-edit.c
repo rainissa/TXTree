@@ -10,11 +10,6 @@ char buffer[MAX_ROW][MAX_KARAKTER];
 int jumlahBaris = 0;
 int i;
 
-void clearScreen()
-{
-    system("cls");   
-}
-
 void pauseScreen()
 {
     printf("\nTekan ENTER untuk lanjut...");

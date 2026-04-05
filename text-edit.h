@@ -6,7 +6,6 @@
 extern char buffer[MAX_ROW][MAX_KARAKTER];
 extern int jumlahBaris;
 
-void clearScreen();
 void pauseScreen();
 void tampilkan();
 
