@@ -47,42 +47,6 @@ void tambahBaris()
     jumlahBaris = jumlahBaris + 1;
 }
 
-void hapusBaris()
-{
-    int hpsBariske;
-
-    printf("Hapus baris: ");
-    scanf("%d", &hpsBariske);
-    getchar();
-
-    if(hpsBariske < 1 || hpsBariske > jumlahBaris)
-	{
-        printf("\nBaris tidak ada!\n");
-        pauseScreen();
-        return;
-    }
-
-    pushSnapshot();
-    clearRedo();
-
-    for(i = hpsBariske-1; i < jumlahBaris-1; i++)
-	{
-        strcpy(buffer[i], buffer[i+1]);
-    }
-
-    jumlahBaris = jumlahBaris - 1;
-
-    if (jumlahBaris == 0)
-    {
-        cursor_row = 0;
-    }
-    else if (cursor_row >= jumlahBaris)
-    {
-        cursor_row = jumlahBaris - 1;
-    }
-    cursor_col = 0;
-}
-
 void editBaris()
 {
     int nomor;

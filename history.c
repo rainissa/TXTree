@@ -75,7 +75,6 @@ static void restoreSnapshot(Snapshot *snap) {
 // ======================
 void pushSnapshot() {
     saveToStack(undoStack, &undoTop);
-    clearRedo();
 }
 
 // ======================

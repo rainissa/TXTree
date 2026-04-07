@@ -4,6 +4,7 @@
 #include "open-save.h"
 #include "cursor.h"
 #include "config.h"
+#include "history.h"
 
 // Mengecek apakah file berekstensi .txt
 int cekTxt(char namaFile[])
@@ -48,11 +49,15 @@ void openFile()
         pauseScreen();
         return;
     }
+
+    pushSnapshot();
+    clearRedo();
+
     jumlahBaris = 0;
 
     while(jumlahBaris < MAX_ROW && fgets(buffer[jumlahBaris], MAX_KARAKTER, file) != NULL)
     {   
-        buffer[jumlahBaris][strcspn(buffer[jumlahBaris], "\n")] = '\0';
+        buffer[jumlahBaris][strcspn(buffer[jumlahBaris], "\r\n")] = '\0';
         jumlahBaris = jumlahBaris + 1;
     }
     fclose(file);

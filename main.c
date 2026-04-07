@@ -20,18 +20,17 @@ void tampilkanHeader() {
 void tampilkanMenu() {
     printf("\n========== MENU ==========\n");
     printf("1. Tambah Baris\n");
-    printf("2. Hapus Baris\n");
-    printf("3. Edit Baris\n");
-    printf("4. Sisip Baris\n");
-    printf("5. Save File\n");
-    printf("6. Open File\n");
-    printf("7. Copy\n");
-    printf("8. Cut\n");
-    printf("9. Paste\n");
-    printf("10. Undo\n");
-    printf("11. Redo\n");
-    printf("12. Set Cursor\n");
-    printf("13. Keluar\n");
+    printf("2. Edit Baris\n");
+    printf("3. Sisip Baris\n");
+    printf("4. Save File\n");
+    printf("5. Open File\n");
+    printf("6. Copy\n");
+    printf("7. Cut\n");
+    printf("8. Paste\n");
+    printf("9. Undo\n");
+    printf("10. Redo\n");
+    printf("11. Set Cursor\n");
+    printf("12. Keluar\n");
     printf("==========================\n");
 }
 
@@ -100,46 +99,42 @@ int main() {
                 break;
 
             case 2:
-                hapusBaris();
-                break;
-
-            case 3:
                 editBaris();
                 break;
 
-            case 4:
+            case 3:
                 sisipBaris();
                 break;
 
-            case 5:
+            case 4:
                 saveFile();
                 break;
 
-            case 6:
+            case 5:
                 openFile();
                 break;
 
-            case 7:
+            case 6:
                 copyLine();
                 break; 
 
-            case 8:
+            case 7:
                 cutLine();
                 break;
 
-            case 9:
+            case 8:
                 pasteLine();
                 break;
 
-            case 10:
+            case 9:
                 undo();
                 break;
 
-            case 11:
+            case 10:
                 redo();
                 break;
 
-            case 12: {
+            case 11: {
                 if (jumlahBaris == 0) {
                     printf("Dokumen masih kosong!\n");
                     break;
@@ -167,7 +162,7 @@ int main() {
                 break;
             }
 
-            case 13:
+            case 12:
                 printf("Keluar program...\n");
                 return 0;
 

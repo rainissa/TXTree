@@ -4,6 +4,7 @@
 #include "cursor.h"
 #include "history.h"
 #include "config.h"
+#include "text-edit.h"
 
 char clipboard[MAX_KARAKTER];
 
@@ -31,7 +32,8 @@ void copyLine(){
     strncpy(clipboard, buffer[cursor_row] + col, MAX_KARAKTER - 1);
     clipboard[MAX_KARAKTER - 1] = '\0';
 
-    printf("Copy berhasil\n");
+    printf("Copy berhasil: \"%s\"\n", clipboard);
+    pauseScreen();
 }
 
 void cutLine(){

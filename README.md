@@ -1,8 +1,7 @@
-Project ini dikerjakan oleh kelompok 3 (TXTree) yang beranggotakan 
+Project ini dikerjakan oleh kelompok 3 (TXTree) di bawah bimbingan Djoko Cahyo Utomo Lieharyani, S.Kom., M.MT selaku manager kelompok, yang beranggotakan:
 1. Ashila Aulia Salwa (251511035 / ashila-AS)
 2. Hasya Nadana Hakim (251511040 / shiningsstars)
 3. Rainissa Azizah (251511059 / rainissa)
-di bawah bimbingan Djoko Cahyo Utomo Lieharyani, S.Kom., M.MT selaku manager kelompok.
 
 A. Setup Environment
 Pastikan sudah menginstal software berikut sebelum menjalankan project ini:
