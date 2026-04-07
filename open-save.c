@@ -39,14 +39,12 @@ void openFile()
     if(cekTxt(namaFile) == 0)
     {
         printf("File harus berekstensi .txt\n");
-        pauseScreen();
         return;
     }
     file = fopen(namaFile, "r");
     if(file == NULL)
     {
         printf("File tidak ditemukan\n");
-        pauseScreen();
         return;
     }
 
@@ -67,7 +65,6 @@ void openFile()
     if(jumlahBaris == MAX_ROW)
     {
         printf("File terlalu besar, sebagian tidak dimuat!\n");
-        pauseScreen();
     }
     printf("File berhasil dibuka\n");
 }
@@ -85,14 +82,12 @@ void saveFile()
     if(cekTxt(namaFile) == 0)
     {
         printf("Nama file harus .txt\n");
-        pauseScreen();
         return;
     }
     file = fopen(namaFile, "w");
     if(file == NULL)
     {
         printf("Gagal menyimpan file\n");
-        pauseScreen();
         return;
     }
     for(i = 0; i < jumlahBaris; i++)

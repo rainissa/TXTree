@@ -33,7 +33,6 @@ void copyLine(){
     clipboard[MAX_KARAKTER - 1] = '\0';
 
     printf("Copy berhasil: \"%s\"\n", clipboard);
-    pauseScreen();
 }
 
 void cutLine(){

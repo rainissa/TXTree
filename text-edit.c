@@ -29,7 +29,6 @@ void tambahBaris()
     if(jumlahBaris >= MAX_ROW)
 	{
         printf("Buffer penuh!\n");
-        pauseScreen();
         return;
     }
 
@@ -57,7 +56,6 @@ void editBaris()
 
     if(nomor < 1 || nomor > jumlahBaris){
         printf("Baris tidak ditemukan!\n");
-        pauseScreen();
         return;
     }
 
@@ -79,7 +77,6 @@ void sisipBaris()
     if(jumlahBaris >= MAX_ROW)
     {
         printf("Buffer penuh!\n");
-        pauseScreen();
         return;
     }
 
@@ -90,7 +87,6 @@ void sisipBaris()
     if(posisi < 1 || posisi > jumlahBaris + 1)
 	{
         printf("Posisi tidak tersedia!\n");
-        pauseScreen();
         return;
     }
 
