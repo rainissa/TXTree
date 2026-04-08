@@ -67,7 +67,7 @@ static void restoreSnapshot(Snapshot *snap) {
         buffer[i][0] = '\0';
     }
 
-    isCursorValid();
+    validateCursor();
 }
 
 // ======================

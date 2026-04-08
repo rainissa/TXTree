@@ -14,10 +14,7 @@ void copyLine(){
         return;
     }
 
-    if (!isCursorValid()){
-        printf("Cursor tidak valid\n");
-        return;
-    }
+    validateCursor();
 
     int len = strlen(buffer[cursor_row]);
 
@@ -26,8 +23,12 @@ void copyLine(){
         return;
     }
 
-    int col = cursor_col;
-    if (col > len) col = len;
+    int col = cursor_col; // sudah pasti valid
+
+    if (col >= len){
+        printf("Tidak ada teks setelah cursor untuk dicopy\n");
+        return;
+    }
 
     strncpy(clipboard, buffer[cursor_row] + col, MAX_KARAKTER - 1);
     clipboard[MAX_KARAKTER - 1] = '\0';
@@ -41,10 +42,7 @@ void cutLine(){
         return;
     }
 
-    if (!isCursorValid()){
-        printf("Cursor tidak valid\n");
-        return;
-    }
+    validateCursor();
 
     int len = strlen(buffer[cursor_row]);
 
@@ -54,7 +52,11 @@ void cutLine(){
     }
 
     int col = cursor_col;
-    if (col > len) col = len;
+
+    if (col >= len){
+        printf("Tidak ada teks setelah cursor untuk dicut\n");
+        return;
+    }
 
     pushSnapshot();
     clearRedo();
@@ -75,15 +77,10 @@ void pasteLine(){
         return;
     }
 
-    if (!isCursorValid()){
-        printf("Cursor tidak valid\n");
-        return;
-    }
+    validateCursor();
 
     int len = strlen(buffer[cursor_row]);
-
     int col = cursor_col;
-    if (col > len) col = len;
 
     if (len >= MAX_KARAKTER - 1){
         printf("Baris sudah penuh\n");
@@ -95,7 +92,7 @@ void pasteLine(){
     strncpy(temp, buffer[cursor_row] + col, MAX_KARAKTER - 1);
     temp[MAX_KARAKTER - 1] = '\0';
 
-    int total = strlen(buffer[cursor_row]) + strlen(clipboard);
+    int total = len + strlen(clipboard); // pakai len biar efisien
     if (total >= MAX_KARAKTER){
         printf("Paste gagal: melebihi kapasitas baris\n");
         return;

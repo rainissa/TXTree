@@ -5,9 +5,7 @@
 extern int cursor_row;
 extern int cursor_col;
 
-// validasi & sanitasi posisi cursor
-// return 0 jika dokumen kosong, return 1 jika valid
-int isCursorValid();
+void validateCursor();
 
 // set cursor ke posisi tertentu
 void setCursor(int row, int col);

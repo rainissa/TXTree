@@ -51,22 +51,6 @@ int inputInt() {
     }
 }
 
-void validateCursor() {
-    if (jumlahBaris == 0) {
-        cursor_row = 0;
-        cursor_col = 0;
-        return;
-    }
-
-    if (cursor_row < 0) cursor_row = 0;
-    if (cursor_row >= jumlahBaris) cursor_row = jumlahBaris - 1;
-
-    int len = strlen(buffer[cursor_row]);
-
-    if (cursor_col < 0) cursor_col = 0;
-    if (cursor_col > len) cursor_col = len;
-}
-
 int main() {
     int pilihan;
 
