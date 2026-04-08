@@ -6,7 +6,6 @@
 #include "config.h"
 #include "history.h"
 
-// Mengecek apakah file berekstensi .txt
 int cekTxt(char namaFile[])
 {
     int panjang = strlen(namaFile);

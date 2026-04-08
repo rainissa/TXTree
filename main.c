@@ -66,7 +66,7 @@ int main() {
 
         validateCursor();
 
-        printf("\nCursor di baris: %d, kolom: %d\n", cursor_row, cursor_col);
+        printf("\nCursor di baris: %d, kolom: %d\n", cursor_row + 1, cursor_col + 1);
 
         tampilkanMenu();
 
@@ -126,21 +126,22 @@ int main() {
 
                 int pos, col;
 
-                printf("Masukkan baris cursor: ");
-                pos = inputInt();
+                printf("Masukkan baris cursor (1-%d): ", jumlahBaris);
+                pos = inputInt() - 1;
 
                 if (pos < 0 || pos >= jumlahBaris) {
                     printf("Posisi baris tidak valid!\n");
                     break;
                 }
 
-                printf("Masukkan kolom cursor: ");
-                col = inputInt();
+                printf("Masukkan kolom cursor (1-%d): ", (int)strlen(buffer[pos]) + 1);
+                col = inputInt() - 1;
 
-                int len = strlen(buffer[pos]);
-
-                if (col < 0) col = 0;
-                if (col > len) col = len;
+                int panjang = strlen(buffer[pos]);
+                if (col < 0 || col > panjang) {
+                    printf("Posisi kolom tidak valid!\n");
+                    break;
+                }
 
                 setCursor(pos, col);
                 break;

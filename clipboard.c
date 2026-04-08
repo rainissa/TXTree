@@ -23,7 +23,7 @@ void copyLine(){
         return;
     }
 
-    int col = cursor_col; // sudah pasti valid
+    int col = cursor_col;
 
     if (col >= len){
         printf("Tidak ada teks setelah cursor untuk dicopy\n");

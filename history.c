@@ -5,29 +5,21 @@
 #include "text-edit.h"
 #include "config.h"
 
-// Ambil variabel global dari file lain
 extern char buffer[MAX_ROW][MAX_KARAKTER];
 extern int jumlahBaris;
 extern int cursor_row;
 extern int cursor_col;
 
-// Stack undo & redo
 Snapshot undoStack[STACK_SIZE];
 int undoTop = -1;
 
 Snapshot redoStack[STACK_SIZE];
 int redoTop = -1;
 
-// ======================
-// Clear redo
-// ======================
 void clearRedo() {
     redoTop = -1;
 }
 
-// ======================
-// Helper: simpan state saat ini ke stack
-// ======================
 static void saveToStack(Snapshot *stack, int *top) {
     // shift rolling jika stack penuh
     if (*top == STACK_SIZE - 1) {
@@ -50,9 +42,6 @@ static void saveToStack(Snapshot *stack, int *top) {
     }
 }
 
-// ======================
-// Helper: restore snapshot ke buffer aktif
-// ======================
 static void restoreSnapshot(Snapshot *snap) {
     jumlahBaris = snap->jumlahBaris;
     cursor_row  = snap->cursor_row;
@@ -70,16 +59,10 @@ static void restoreSnapshot(Snapshot *snap) {
     validateCursor();
 }
 
-// ======================
-// Push snapshot sebelum edit
-// ======================
 void pushSnapshot() {
     saveToStack(undoStack, &undoTop);
 }
 
-// ======================
-// Undo
-// ======================
 void undo() {
     if (undoTop < 0) {
         printf("\n[!] Tidak ada aksi untuk di-undo.\n");
@@ -93,9 +76,6 @@ void undo() {
     printf("\n[v] Undo berhasil.\n");
 }
 
-// ======================
-// Redo
-// ======================
 void redo() {
     if (redoTop < 0) {
         printf("\n[!] Tidak ada aksi untuk di-redo.\n");

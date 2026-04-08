@@ -2,11 +2,9 @@
 #include "cursor.h"
 #include "text-edit.h"
 
-// inisialisasi
 int cursor_row = 0;
 int cursor_col = 0;
 
-// fungsi validasi & normalisasi cursor
 void validateCursor() {
     if (jumlahBaris == 0) {
         cursor_row = 0;
