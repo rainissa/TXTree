@@ -10,7 +10,6 @@ void pauseScreen();
 void tampilkan();
 
 void tambahBaris();
-void hapusBaris();
 void editBaris();
 void sisipBaris();
 
