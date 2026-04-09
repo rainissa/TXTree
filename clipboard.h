@@ -7,7 +7,9 @@
 extern char buffer[MAX_ROW][MAX_KARAKTER];
 extern int jumlahBaris;
 
-extern char clipboard[MAX_KARAKTER];
+void setClipboard(const char *text);
+char* getClipboard();
+int isClipboardEmpty();
 
 void copyLine();
 void cutLine();

@@ -54,7 +54,7 @@ int inputInt() {
 int main() {
     int pilihan;
 
-    clipboard[0] = '\0';
+    setClipboard("");
 
     while (1) {
         CLEAR();
