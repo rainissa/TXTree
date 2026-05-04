@@ -6,6 +6,8 @@
 #include "config.h"
 #include "history.h"
 
+int isModified = 0;
+char currentFile[100] = "";
 int cekTxt(char namaFile[])
 {
     int panjang = strlen(namaFile);
@@ -60,6 +62,8 @@ void openFile()
     fclose(file);
     cursor_row = 0;
     cursor_col = 0;
+    strcpy(currentFile, namaFile);
+    isModified = 0;
 
     if(jumlahBaris == MAX_ROW)
     {
@@ -74,15 +78,40 @@ void saveFile()
     char namaFile[100];
     int i;
 
-    printf("Masukkan nama file (.txt): ");
-    fgets(namaFile, 100, stdin);
-	namaFile[strcspn(namaFile, "\n")] = '\0';
-
-    if(cekTxt(namaFile) == 0)
+    if(strlen(currentFile)==0)
     {
-        printf("Nama file harus .txt\n");
+        printf("Masukkan nama file (.txt): ");
+        fgets(namaFile, 100, stdin);
+        namaFile[strcspn(namaFile, "\n")] = '\0';
+
+        if(cekTxt(namaFile) == 0)
+        {
+            printf("Nama file harus .txt\n");
+            return;
+        }
+        strcpy(currentFile, namaFile);
+    }
+    else
+    {
+        strcpy(namaFile, currentFile);
+        printf("Menyimpan ke file: %s\n", namaFile);
+    }    
+    if(isModified==0)
+    {
+        printf("Tidak ada perubahan untuk disimpan\n");
         return;
     }
+    char konfirmasi;
+    printf("File telah diubah. Yakin ingin menyimpan? (y/n): ");
+    scanf(" %c", &konfirmasi);
+    getchar();
+
+    if(konfirmasi != 'y' && konfirmasi != 'Y')
+    {
+        printf("Penyimpanan dibatalkan\n");
+        return;
+    }
+
     file = fopen(namaFile, "w");
     if(file == NULL)
     {
@@ -94,5 +123,6 @@ void saveFile()
         fprintf(file, "%s\n", buffer[i]);
     }
     fclose(file);
+    isModified=0;
     printf("File berhasil disimpan\n");
 }

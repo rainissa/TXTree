@@ -5,6 +5,7 @@
 #include "cursor.h"
 #include "history.h"
 #include "config.h"
+extern int isModified;
 
 char buffer[MAX_ROW][MAX_KARAKTER];
 int jumlahBaris = 0;
@@ -44,6 +45,7 @@ void tambahBaris()
     cursor_col = 0;
 
     jumlahBaris = jumlahBaris + 1;
+    isModified = 1;
 }
 
 void editBaris()
@@ -53,7 +55,9 @@ void editBaris()
     printf("Masukkan nomor baris yang ingin diubah: ");
     scanf("%d", &nomor);
     getchar();
-
+    
+    while (getchar()!='\n');
+    
     if(nomor < 1 || nomor > jumlahBaris){
         printf("Baris tidak ditemukan!\n");
         return;
@@ -69,6 +73,7 @@ void editBaris()
 
     cursor_row = nomor - 1;
     cursor_col = 0;
+    isModified = 1;
 }
 
 void sisipBaris()
@@ -106,4 +111,5 @@ void sisipBaris()
     cursor_col = 0;
 
     jumlahBaris = jumlahBaris + 1;
+    isModified = 1;
 }
