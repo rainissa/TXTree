@@ -5,6 +5,7 @@
 #include "history.h"
 #include "config.h"
 #include "text-edit.h"
+#include "charlist.h"
 
 static char clipboard[MAX_KARAKTER];
 
@@ -47,11 +48,24 @@ int isValidCopyCut(int *col, int *len) {
 }
 
 void copyLine(){
-    int col, len;
+     int col, len;
 
     if (!isValidCopyCut(&col, &len)) return;
 
-    setClipboard(buffer[cursor_row] + col);
+    const char *start = buffer[cursor_row] + col;
+
+    CharNode *list = buildList(start);
+    if (!list){
+        printf("Gagal alokasi memori\n");
+        return;
+    }
+
+    char temp[MAX_KARAKTER];
+    listToString(list, temp, MAX_KARAKTER);
+
+    setClipboard(temp);
+
+    freeList(list);
 
     printf("Copy berhasil: \"%s\"\n", getClipboard());
 }
@@ -73,13 +87,26 @@ void cutLine(){
 }
 
 void pasteLine(){
-    if (jumlahBaris == 0){
-        printf("Dokumen kosong\n");
+    if (isClipboardEmpty()){
+        printf("Clipboard kosong\n");
         return;
     }
 
-    if (isClipboardEmpty()){
-        printf("Clipboard kosong\n");
+    const char *clip = getClipboard();
+    int clipLen = strlen(clip);
+
+    if (jumlahBaris == 0){
+        pushSnapshot();
+        clearRedo();
+
+        strncpy(buffer[0], clip, MAX_KARAKTER - 1);
+        buffer[0][MAX_KARAKTER - 1] = '\0';
+
+        jumlahBaris = 1;
+        cursor_row = 0;
+        cursor_col = strlen(buffer[0]);
+
+        printf("Paste berhasil (baris baru dibuat)\n");
         return;
     }
 
@@ -94,10 +121,9 @@ void pasteLine(){
     }
 
     char temp[MAX_KARAKTER];
-    strcpy(temp, buffer[cursor_row] + col);
+    strncpy(temp, buffer[cursor_row] + col, MAX_KARAKTER - 1);
+    temp[MAX_KARAKTER - 1] = '\0';
 
-    char *clip = getClipboard();
-    int clipLen = strlen(clip);
     int tempLen = strlen(temp);
 
     if (col + clipLen + tempLen >= MAX_KARAKTER){
