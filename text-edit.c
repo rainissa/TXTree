@@ -6,10 +6,13 @@
 #include "history.h"
 #include "config.h"
 extern int isModified;
-
-char buffer[MAX_ROW][MAX_KARAKTER];
+List L;
 int jumlahBaris = 0;
-int i;
+
+void CreateList(List *L)
+{
+    First(*L) = Nil;
+}
 
 void pauseScreen()
 {
@@ -19,9 +22,55 @@ void pauseScreen()
 
 void tampilkan()
 {
-    for(i = 0; i < jumlahBaris; i++)
-	{
-        printf("%2d | %s\n", i+1, buffer[i]);
+    address temp = First(L);
+    int i=1;
+    while (temp != NULL)
+    {
+        printf ("%2d | %s\n", i, Info(temp));
+        temp = Next(temp);
+        i=i+1;
+    }
+}
+
+void insertFirst(address P)
+{
+    if(First(L)!=Nil)
+    {
+        Prev(First(L))=P;
+        Next(P)=First(L);
+    }
+    First(L)=P;
+}
+
+void insertLast(address P)
+{
+    if(First(L)==Nil)
+    {
+        First(L)=P;
+        return;
+    }
+    address temp = First(L);
+    while (Next(temp)!=Nil)
+    {
+        temp=Next(temp);
+    }
+    Next(temp)=P;
+    Prev(P)=temp;
+}
+
+void insertBefore (address P, address temp)
+{
+    address before = Prev(temp);
+    if (before == Nil)
+    {
+        insertFirst(P);
+    }
+    else
+    {
+        Next(before) = P;
+        Prev(P) = before;
+        Next(P) = temp;
+        Prev(temp) = P;
     }
 }
 
@@ -32,18 +81,41 @@ void tambahBaris()
         printf("Buffer penuh!\n");
         return;
     }
-
     pushSnapshot();
     clearRedo();
 
+    infotype teks;
     printf("Masukkan teks: "); 
-    fgets(buffer[jumlahBaris], MAX_KARAKTER, stdin);
+    fgets(teks, MAX_KARAKTER, stdin);
+    teks[strcspn(teks, "\n")] = 0;
 
-    buffer[jumlahBaris][strcspn(buffer[jumlahBaris], "\n")] = 0;
+    address P = Alokasi(teks);
+    address temp = First(L);
+    int idx = 0;
+    while (temp != Nil && idx < cursor_row)
+    {
+        temp = Next(temp);
+        idx=idx+1;
+    }
 
+    if (First(L)==Nil)
+    {
+        insertFirst(P);
+    }
+    else if(temp == First(L))
+    {
+        insertFirst(P);
+    }
+    else if(temp == Nil)
+    {
+        insertLast(P);
+    }
+    else
+    {
+        insertBefore(P, temp);
+    }
     cursor_row = jumlahBaris;  // update cursor di baris baru
     cursor_col = 0;
-
     jumlahBaris = jumlahBaris + 1;
     isModified = 1;
 }
@@ -65,51 +137,21 @@ void editBaris()
 
     pushSnapshot();
     clearRedo();
-
-    printf("Masukkan teks pengganti: ");
-    fgets(buffer[nomor-1], MAX_KARAKTER, stdin);
-
-    buffer[nomor-1][strcspn(buffer[nomor-1], "\n")] = 0;
-
+    
+    address temp = First(L);
+    int idx = 1;
+    while (temp != NULL && idx < nomor)
+    {
+        temp = Next(temp);
+        idx=idx+1;
+    }
+    if (temp != NULL)
+    {
+        printf("Masukkan teks pengganti: ");
+        fgets(Info(temp), MAX_KARAKTER, stdin);
+        Info(temp)[strcspn(Info(temp), "\n")] = 0;
     cursor_row = nomor - 1;
     cursor_col = 0;
     isModified = 1;
-}
-
-void sisipBaris()
-{
-    int posisi, i;
-    if(jumlahBaris >= MAX_ROW)
-    {
-        printf("Buffer penuh!\n");
-        return;
     }
-
-    printf("Masukkan posisi baris: ");
-    scanf("%d", &posisi);
-    getchar();
-
-    if(posisi < 1 || posisi > jumlahBaris + 1)
-	{
-        printf("Posisi tidak tersedia!\n");
-        return;
-    }
-
-    pushSnapshot();
-    clearRedo();
-
-    for(i = jumlahBaris; i >= posisi; i--){
-        strcpy(buffer[i], buffer[i-1]);
-    }
-
-    printf("Tulis teks baru: ");
-    fgets(buffer[posisi-1], MAX_KARAKTER, stdin);
-
-    buffer[posisi-1][strcspn(buffer[posisi-1], "\n")] = 0;
-
-    cursor_row = posisi - 1;
-    cursor_col = 0;
-
-    jumlahBaris = jumlahBaris + 1;
-    isModified = 1;
 }
