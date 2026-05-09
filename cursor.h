@@ -1,13 +1,21 @@
 #ifndef CURSOR_H
 #define CURSOR_H
 
-// cursor baris & kolom
-extern int cursor_row;
-extern int cursor_col;
+typedef struct CursorNode {
+    int col;
+    struct CursorNode *next;
+} CursorNode;
 
-void validateCursor();
+extern CursorNode *cursor_head;
 
-// set cursor ke posisi tertentu
-void setCursor(int row, int col);
+#define cursor_col (cursor_head ? cursor_head->col : 0)
+
+void initCursor(void);
+void validateCursor(void);
+void setCursor(int col);
+void pushCursor(int col);
+int  popCursor(void);
+void freeCursorList(void);
+void printCursorList(void);
 
 #endif

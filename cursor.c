@@ -1,29 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "cursor.h"
-#include "text-edit.h"
+#include "config.h"
 
-int cursor_row = 0;
-int cursor_col = 0;
+extern int jumlahBaris;
+extern char buffer[MAX_ROW][MAX_KARAKTER];
 
-void validateCursor() {
-    if (jumlahBaris == 0) {
-        cursor_row = 0;
-        cursor_col = 0;
+CursorNode *cursor_head = NULL;
+
+void initCursor(void) {
+    freeCursorList();
+
+    CursorNode *node = (CursorNode*) malloc(sizeof(CursorNode));
+    if (!node) {
+        fprintf(stderr, "initCursor: gagal alokasi memori\n");
+        return;
+    }
+    node->col  = 0;
+    node->next = NULL;
+    cursor_head = node;
+}
+
+void validateCursor(void) {
+    if (!cursor_head) {
+        initCursor();
         return;
     }
 
-    if (cursor_row < 0) cursor_row = 0;
-    if (cursor_row >= jumlahBaris) cursor_row = jumlahBaris - 1;
+    if (jumlahBaris == 0) {
+        cursor_head->col = 0;
+        return;
+    }
 
-    int len = strlen(buffer[cursor_row]);
-
-    if (cursor_col < 0) cursor_col = 0;
-    if (cursor_col > len) cursor_col = len;
+    int len = strlen(buffer[0]);
+    if (cursor_head->col < 0)   cursor_head->col = 0;
+    if (cursor_head->col > len) cursor_head->col = len;
 }
 
-
-void setCursor(int row, int col) {
-    cursor_row = row;
-    cursor_col = col;
+void setCursor(int col) {
+    if (!cursor_head) initCursor();
+    cursor_head->col = col;
     validateCursor();
+}
+
+void pushCursor(int col) {
+    CursorNode *node = (CursorNode*) malloc(sizeof(CursorNode));
+    if (!node) {
+        fprintf(stderr, "pushCursor: gagal alokasi memori\n");
+        return;
+    }
+    node->col  = col;
+    node->next = cursor_head;
+    cursor_head = node;
+    validateCursor();
+}
+
+int popCursor(void) {
+    if (!cursor_head || !cursor_head->next) {
+        printf("Tidak ada riwayat kolom cursor sebelumnya\n");
+        return 0;
+    }
+
+    CursorNode *hapus = cursor_head;
+    cursor_head = cursor_head->next;
+    free(hapus);
+
+    printf("Cursor kembali ke kolom %d\n", cursor_head->col);
+    return 1;
+}
+
+void printCursorList(void) {
+    CursorNode *temp = cursor_head;
+    int i = 0;
+    printf("=== Linked List Cursor ===\n");
+    while (temp) {
+        printf("  [%d] col=%d%s\n", i, temp->col, i == 0 ? "  <- AKTIF" : "");
+        temp = temp->next;
+        i++;
+    }
+    if (i == 0) printf("  (kosong)\n");
+    printf("==========================\n");
+}
+
+void freeCursorList(void) {
+    while (cursor_head) {
+        CursorNode *hapus = cursor_head;
+        cursor_head = cursor_head->next;
+        free(hapus);
+    }
 }
