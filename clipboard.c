@@ -1,148 +1,141 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
 #include "clipboard.h"
-#include "cursor.h"
+#include "text-edit.h"
 #include "history.h"
 #include "config.h"
-#include "text-edit.h"
-#include "charlist.h"
 
 static char clipboard[MAX_KARAKTER];
 
-void setClipboard(const char *text) {
+void setClipboard(const char *text)
+{
     strncpy(clipboard, text, MAX_KARAKTER - 1);
     clipboard[MAX_KARAKTER - 1] = '\0';
 }
 
-char* getClipboard() {
+char* getClipboard()
+{
     return clipboard;
 }
 
-int isClipboardEmpty() {
+int isClipboardEmpty()
+{
     return clipboard[0] == '\0';
 }
 
-int isValidCopyCut(int *col, int *len) {
-    if (jumlahBaris == 0){
-        printf("Dokumen kosong\n");
-        return 0;
-    }
-
-    validateCursor();
-
-    *len = strlen(buffer[cursor_row]);
-
-    if (*len == 0){
-        printf("Baris kosong\n");
-        return 0;
-    }
-
-    *col = cursor_col;
-
-    if (*col >= *len){
-        printf("Tidak ada teks setelah cursor\n");
-        return 0;
-    }
-
-    return 1;
-}
-
-void copyLine(){
-     int col, len;
-
-    if (!isValidCopyCut(&col, &len)) return;
-
-    const char *start = buffer[cursor_row] + col;
-
-    CharNode *list = buildList(start);
-    if (!list){
-        printf("Gagal alokasi memori\n");
+void copyLine(List *L, address current)
+{
+    if (First(*L) == NULL || current == NULL)
+    {
+        printf("Tidak ada baris aktif\n");
         return;
     }
 
-    char temp[MAX_KARAKTER];
-    listToString(list, temp, MAX_KARAKTER);
+    setClipboard(Info(current));
 
-    setClipboard(temp);
-
-    freeList(list);
-
-    printf("Copy berhasil: \"%s\"\n", getClipboard());
+    printf("Copy berhasil:\n\"%s\"\n", getClipboard());
 }
 
-void cutLine(){
-    int col, len;
+void cutLine(List *L, address *current)
+{
+    address hapus;
 
-    if (!isValidCopyCut(&col, &len)) return;
+    if (First(*L) == NULL || *current == NULL)
+    {
+        printf("Tidak ada baris aktif\n");
+        return;
+    }
 
     pushSnapshot();
     clearRedo();
 
-    setClipboard(buffer[cursor_row] + col);
+    setClipboard(Info(*current));
 
-    buffer[cursor_row][col] = '\0';
-    cursor_col = col;
+    hapus = *current;
+
+    /* node satu-satunya */
+    if (Prev(hapus) == NULL && Next(hapus) == NULL)
+    {
+        First(*L) = NULL;
+        *current = NULL;
+    }
+
+    /* hapus node pertama */
+    else if (Prev(hapus) == NULL)
+    {
+        First(*L) = Next(hapus);
+        Prev(Next(hapus)) = NULL;
+
+        *current = First(*L);
+    }
+
+    /* hapus node terakhir */
+    else if (Next(hapus) == NULL)
+    {
+        Next(Prev(hapus)) = NULL;
+
+        *current = Prev(hapus);
+    }
+
+    /* hapus node tengah */
+    else
+    {
+        Next(Prev(hapus)) = Next(hapus);
+        Prev(Next(hapus)) = Prev(hapus);
+
+        *current = Next(hapus);
+    }
+
+    free(hapus);
 
     printf("Cut berhasil\n");
 }
 
-void pasteLine(){
-    if (isClipboardEmpty()){
+void pasteLine(List *L, address *current)
+{
+    address baru;
+
+    if (isClipboardEmpty())
+    {
         printf("Clipboard kosong\n");
-        return;
-    }
-
-    const char *clip = getClipboard();
-    int clipLen = strlen(clip);
-
-    if (jumlahBaris == 0){
-        pushSnapshot();
-        clearRedo();
-
-        strncpy(buffer[0], clip, MAX_KARAKTER - 1);
-        buffer[0][MAX_KARAKTER - 1] = '\0';
-
-        jumlahBaris = 1;
-        cursor_row = 0;
-        cursor_col = strlen(buffer[0]);
-
-        printf("Paste berhasil (baris baru dibuat)\n");
-        return;
-    }
-
-    validateCursor();
-
-    int col = cursor_col;
-    int len = strlen(buffer[cursor_row]);
-
-    if (len >= MAX_KARAKTER - 1){
-        printf("Baris sudah penuh\n");
-        return;
-    }
-
-    char temp[MAX_KARAKTER];
-    strncpy(temp, buffer[cursor_row] + col, MAX_KARAKTER - 1);
-    temp[MAX_KARAKTER - 1] = '\0';
-
-    int tempLen = strlen(temp);
-
-    if (col + clipLen + tempLen >= MAX_KARAKTER){
-        printf("Paste gagal: melebihi kapasitas baris\n");
         return;
     }
 
     pushSnapshot();
     clearRedo();
 
-    buffer[cursor_row][col] = '\0';
+    baru = Alokasi(getClipboard());
 
-    int sisa = MAX_KARAKTER - strlen(buffer[cursor_row]) - 1;
-    strncat(buffer[cursor_row], clip, sisa);
+    if (baru == NULL)
+    {
+        printf("Gagal alokasi memori\n");
+        return;
+    }
 
-    sisa = MAX_KARAKTER - strlen(buffer[cursor_row]) - 1;
-    strncat(buffer[cursor_row], temp, sisa);
+    /* jika list kosong */
+    if (First(*L) == NULL)
+    {
+        First(*L) = baru;
+        *current = baru;
 
-    cursor_col = col + clipLen;
+        printf("Paste berhasil\n");
+        return;
+    }
+
+    /* sisip setelah current */
+    Next(baru) = Next(*current);
+    Prev(baru) = *current;
+
+    if (Next(*current) != NULL)
+    {
+        Prev(Next(*current)) = baru;
+    }
+
+    Next(*current) = baru;
+
+    *current = baru;
 
     printf("Paste berhasil\n");
 }

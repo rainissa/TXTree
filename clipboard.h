@@ -2,16 +2,14 @@
 #define CLIPBOARD_H
 
 #include "config.h"
-
-extern char buffer[MAX_ROW][MAX_KARAKTER];
-extern int jumlahBaris;
+#include "text-edit.h"
 
 void setClipboard(const char *text);
 char* getClipboard();
 int isClipboardEmpty();
 
-void copyLine();
-void cutLine();
-void pasteLine();
+void copyLine(List *L, address current);
+void cutLine(List *L, address *current);
+void pasteLine(List *L, address *current);
 
 #endif
