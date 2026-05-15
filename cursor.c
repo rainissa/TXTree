@@ -1,92 +1,41 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "cursor.h"
-#include "config.h"
+#include "text-edit.h"
 
-extern int jumlahBaris;
-extern char buffer[MAX_ROW][MAX_KARAKTER];
+extern List L;
 
-CursorNode *cursor_head = NULL;
+static address current = NULL;
 
 void initCursor(void) {
-    freeCursorList();
-
-    CursorNode *node = (CursorNode*) malloc(sizeof(CursorNode));
-    if (!node) {
-        fprintf(stderr, "initCursor: gagal alokasi memori\n");
-        return;
-    }
-    node->col  = 0;
-    node->next = NULL;
-    cursor_head = node;
+    current = First(L);
 }
 
 void validateCursor(void) {
-    if (!cursor_head) {
-        initCursor();
+    if (First(L) == NULL) {
+        current = NULL;
         return;
     }
 
-    if (jumlahBaris == 0) {
-        cursor_head->col = 0;
-        return;
+    if (current == NULL) {
+        current = First(L);
     }
-
-    int len = strlen(buffer[0]);
-    if (cursor_head->col < 0)   cursor_head->col = 0;
-    if (cursor_head->col > len) cursor_head->col = len;
 }
 
-void setCursor(int col) {
-    if (!cursor_head) initCursor();
-    cursor_head->col = col;
+void setCursor(address node) {
+    address p = First(L);
+
+    while (p != NULL && p != node) {
+        p = Next(p);
+    }
+
+    if (p != NULL) {
+        current = node;
+    } else {
+        current = NULL;
+    }
+
     validateCursor();
 }
 
-void pushCursor(int col) {
-    CursorNode *node = (CursorNode*) malloc(sizeof(CursorNode));
-    if (!node) {
-        fprintf(stderr, "pushCursor: gagal alokasi memori\n");
-        return;
-    }
-    node->col  = col;
-    node->next = cursor_head;
-    cursor_head = node;
-    validateCursor();
-}
-
-int popCursor(void) {
-    if (!cursor_head || !cursor_head->next) {
-        printf("Tidak ada riwayat kolom cursor sebelumnya\n");
-        return 0;
-    }
-
-    CursorNode *hapus = cursor_head;
-    cursor_head = cursor_head->next;
-    free(hapus);
-
-    printf("Cursor kembali ke kolom %d\n", cursor_head->col);
-    return 1;
-}
-
-void printCursorList(void) {
-    CursorNode *temp = cursor_head;
-    int i = 0;
-    printf("=== Linked List Cursor ===\n");
-    while (temp) {
-        printf("  [%d] col=%d%s\n", i, temp->col, i == 0 ? "  <- AKTIF" : "");
-        temp = temp->next;
-        i++;
-    }
-    if (i == 0) printf("  (kosong)\n");
-    printf("==========================\n");
-}
-
-void freeCursorList(void) {
-    while (cursor_head) {
-        CursorNode *hapus = cursor_head;
-        cursor_head = cursor_head->next;
-        free(hapus);
-    }
+address getCursor(void) {
+    return current;
 }
