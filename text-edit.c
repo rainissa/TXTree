@@ -14,6 +14,20 @@ void CreateList(List *L)
     First(*L) = Nil;
 }
 
+address Alokasi(infotype x)
+{
+    address P = (address) malloc(sizeof(BarisTeks));
+
+    if (P != Nil)
+    {
+        strcpy(Info(P), x);
+        Next(P) = Nil;
+        Prev(P) = Nil;
+    }
+
+    return P;
+}
+
 void pauseScreen()
 {
     printf("\nTekan ENTER untuk lanjut...");
@@ -90,32 +104,24 @@ void tambahBaris()
     teks[strcspn(teks, "\n")] = 0;
 
     address P = Alokasi(teks);
-    address temp = First(L);
-    int idx = 0;
-    while (temp != Nil && idx < cursor_row)
-    {
-        temp = Next(temp);
-        idx=idx+1;
-    }
-
+    address cursor = getCursor();
     if (First(L)==Nil)
     {
         insertFirst(P);
     }
-    else if(temp == First(L))
+    else if(cursor == First(L) || cursor == Nil)
     {
         insertFirst(P);
     }
-    else if(temp == Nil)
+    else if (Next(cursor)==Nil)
     {
         insertLast(P);
     }
     else
     {
-        insertBefore(P, temp);
+        insertBefore(P, cursor);
     }
-    cursor_row = jumlahBaris;  // update cursor di baris baru
-    cursor_col = 0;
+    setCursor(P);  // update cursor di baris baru
     jumlahBaris = jumlahBaris + 1;
     isModified = 1;
 }
@@ -139,19 +145,20 @@ void editBaris()
     clearRedo();
     
     address temp = First(L);
-    int idx = 1;
-    while (temp != NULL && idx < nomor)
+    int i = 1;
+    while (temp != Nil && i < nomor)
     {
         temp = Next(temp);
-        idx=idx+1;
+        i=i+1;
     }
-    if (temp != NULL)
+    if (temp == Nil)
     {
-        printf("Masukkan teks pengganti: ");
-        fgets(Info(temp), MAX_KARAKTER, stdin);
-        Info(temp)[strcspn(Info(temp), "\n")] = 0;
-    cursor_row = nomor - 1;
-    cursor_col = 0;
-    isModified = 1;
+        printf("Baris tidak ditemukan!\n");
+        return;
     }
+    printf("Masukkan teks pengganti: ");
+    fgets(Info(temp), MAX_KARAKTER, stdin);
+    Info(temp)[strcspn(Info(temp), "\n")] = 0;
+    setCursor(temp);
+    isModified = 1;
 }
