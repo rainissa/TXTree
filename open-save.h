@@ -3,5 +3,6 @@
 
 void openFile();
 void saveFile();
+void deleteAll();
 
 #endif

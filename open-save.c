@@ -6,6 +6,9 @@
 #include "config.h"
 #include "history.h"
 
+extern List L;
+extern int jumlahBaris;
+
 int isModified = 0;
 char currentFile[100] = "";
 int cekTxt(char namaFile[])
@@ -28,10 +31,26 @@ int cekTxt(char namaFile[])
     return 0;
 }
 
+void deleteAll()
+{
+    address P = First(L);
+    address temp;
+
+    while(P != Nil)
+    {
+        temp = P;
+        P = Next(P);
+        free(temp);
+    }
+
+    First(L) = Nil;
+}
+
 void openFile()
 {
     FILE *file;
     char namaFile[100];
+    char temp[MAX_KARAKTER];
 
     printf("Masukkan nama file (.txt): ");
     fgets(namaFile, 100, stdin);
@@ -52,16 +71,21 @@ void openFile()
     pushSnapshot();
     clearRedo();
 
+    deleteAll();
     jumlahBaris = 0;
 
-    while(jumlahBaris < MAX_ROW && fgets(buffer[jumlahBaris], MAX_KARAKTER, file) != NULL)
+    while(jumlahBaris < MAX_ROW && fgets(temp, MAX_KARAKTER, file) != NULL)
     {   
-        buffer[jumlahBaris][strcspn(buffer[jumlahBaris], "\r\n")] = '\0';
-        jumlahBaris = jumlahBaris + 1;
+        temp[strcspn(temp, "\r\n")] = '\0';
+        address P = Alokasi(temp);
+        if (P != NULL)
+        {
+            insertLast(P);
+            jumlahBaris = jumlahBaris + 1;
+        }
     }
     fclose(file);
-    cursor_row = 0;
-    cursor_col = 0;
+    initCursor();
     strcpy(currentFile, namaFile);
     isModified = 0;
 
@@ -76,6 +100,7 @@ void saveFile()
 {
     FILE *file;
     char namaFile[100];
+    char konfirmasi;
     int i;
 
     if(strlen(currentFile)==0)
@@ -95,13 +120,13 @@ void saveFile()
     {
         strcpy(namaFile, currentFile);
         printf("Menyimpan ke file: %s\n", namaFile);
-    }    
+    }
+
     if(isModified==0)
     {
         printf("Tidak ada perubahan untuk disimpan\n");
         return;
     }
-    char konfirmasi;
     printf("File telah diubah. Yakin ingin menyimpan? (y/n): ");
     scanf(" %c", &konfirmasi);
     getchar();
@@ -118,11 +143,13 @@ void saveFile()
         printf("Gagal menyimpan file\n");
         return;
     }
-    for(i = 0; i < jumlahBaris; i++)
+    address P = First(L);
+    while (P != Nil)
     {
-        fprintf(file, "%s\n", buffer[i]);
+        fprintf(file, "%s\n", Info(P));   
+        P = Next(P);
     }
     fclose(file);
     isModified=0;
     printf("File berhasil disimpan\n");
-}
+}    
