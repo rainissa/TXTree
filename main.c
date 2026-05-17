@@ -1,83 +1,109 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "text-edit.h"
 #include "clipboard.h"
 #include "cursor.h"
 #include "history.h"
 #include "open-save.h"
-#include "config.h"
 
 #define CLEAR() system("cls")
 
-void tampilkanHeader() {
+extern List L;
+extern int jumlahBaris;
+
+void tampilkanHeader(void)
+{
     printf("=========================================\n");
     printf("         TxTree Text Editor\n");
     printf("=========================================\n");
 }
 
-void tampilkanMenu() {
+void tampilkanMenu(void)
+{
     printf("\n========== MENU ==========\n");
     printf("1. Tambah Baris\n");
     printf("2. Edit Baris\n");
-    printf("3. Sisip Baris\n");
-    printf("4. Save File\n");
-    printf("5. Open File\n");
-    printf("6. Copy\n");
-    printf("7. Cut\n");
-    printf("8. Paste\n");
-    printf("9. Undo\n");
-    printf("10. Redo\n");
-    printf("11. Set Cursor\n");
-    printf("12. Keluar\n");
+    printf("3. Save File\n");
+    printf("4. Open File\n");
+    printf("5. Copy Baris\n");
+    printf("6. Cut Baris\n");
+    printf("7. Paste Baris\n");
+    printf("8. Undo\n");
+    printf("9. Redo\n");
+    printf("10. Keluar\n");
     printf("==========================\n");
 }
 
-void clearInputBuffer() {
+void clearInputBuffer(void)
+{
     int c;
-    while ((c = getchar()) != '\n' && c != EOF);
+
+    while ((c = getchar()) != '\n' && c != EOF)
+    {
+    }
 }
 
-int inputInt() {
+int inputInt(void)
+{
     int value;
-    while (1) {
-        if (scanf("%d", &value) == 1) {
+
+    while (1)
+    {
+        if (scanf("%d", &value) == 1)
+        {
             clearInputBuffer();
             return value;
         }
+
         printf("Input tidak valid! Masukkan angka: ");
         clearInputBuffer();
     }
 }
 
-int main() {
+int main(void)
+{
     int pilihan;
+
+    CreateList(&L);
+
+    initCursor();
 
     setClipboard("");
 
-    while (1) {
+    while (1)
+    {
         CLEAR();
 
         tampilkanHeader();
 
         printf("\n=== ISI DOKUMEN ===\n");
+
         tampilkan();
 
         validateCursor();
 
-        printf("\nCursor di baris: %d, kolom: %d\n", cursor_row + 1, cursor_col + 1);
+        if (getCursor() != NULL)
+        {
+            printf("\nCursor di baris: %d\n", getCursorIndex() + 1);
+        }
+        else
+        {
+            printf("\nCursor belum aktif\n");
+        }
 
         tampilkanMenu();
 
         printf("Pilih menu: ");
+
         pilihan = inputInt();
 
         CLEAR();
+
         tampilkanHeader();
 
-        switch (pilihan) {
-
+        switch (pilihan)
+        {
             case 1:
                 tambahBaris();
                 break;
@@ -87,76 +113,47 @@ int main() {
                 break;
 
             case 3:
-                sisipBaris();
-                break;
-
-            case 4:
                 saveFile();
                 break;
 
-            case 5:
+            case 4:
                 openFile();
                 break;
 
-            case 6:
+            case 5:
                 copyLine();
-                break; 
+                break;
 
-            case 7:
+            case 6:
                 cutLine();
                 break;
 
-            case 8:
+            case 7:
                 pasteLine();
                 break;
 
-            case 9:
+            case 8:
                 undo();
                 break;
 
-            case 10:
+            case 9:
                 redo();
                 break;
 
-            case 11: {
-                if (jumlahBaris == 0) {
-                    printf("Dokumen masih kosong!\n");
-                    break;
-                }
-
-                int pos, col;
-
-                printf("Masukkan baris cursor (1-%d): ", jumlahBaris);
-                pos = inputInt() - 1;
-
-                if (pos < 0 || pos >= jumlahBaris) {
-                    printf("Posisi baris tidak valid!\n");
-                    break;
-                }
-
-                printf("Masukkan kolom cursor (1-%d): ", (int)strlen(buffer[pos]) + 1);
-                col = inputInt() - 1;
-
-                int panjang = strlen(buffer[pos]);
-                if (col < 0 || col > panjang) {
-                    printf("Posisi kolom tidak valid!\n");
-                    break;
-                }
-
-                setCursor(pos, col);
-                break;
-            }
-
-            case 12:
+            case 10:
                 printf("Keluar program...\n");
+                clearHistory();
                 return 0;
 
             default:
                 printf("Menu tidak valid!\n");
+                break;
         }
 
         validateCursor();
 
         pauseScreen();
     }
+
+    return 0;
 }

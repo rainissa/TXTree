@@ -1,141 +1,155 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "clipboard.h"
-#include "text-edit.h"
+#include "cursor.h"
 #include "history.h"
 #include "config.h"
 
-static char clipboard[MAX_KARAKTER];
+extern List L;
+extern int jumlahBaris;
+extern int isModified;
+
+static char clipboard[MAX_KARAKTER] = "";
 
 void setClipboard(const char *text)
 {
+    if (text == NULL)
+    {
+        clipboard[0] = '\0';
+        return;
+    }
+
     strncpy(clipboard, text, MAX_KARAKTER - 1);
     clipboard[MAX_KARAKTER - 1] = '\0';
 }
 
-char* getClipboard()
+const char *getClipboard(void)
 {
     return clipboard;
 }
 
-int isClipboardEmpty()
+void copyLine(void)
 {
-    return clipboard[0] == '\0';
-}
+    address current = getCursor();
 
-void copyLine(List *L, address current)
-{
-    if (First(*L) == NULL || current == NULL)
+    if (current == NULL)
     {
-        printf("Tidak ada baris aktif\n");
+        printf("Tidak ada baris yang dipilih!\n");
         return;
     }
 
     setClipboard(Info(current));
 
-    printf("Copy berhasil:\n\"%s\"\n", getClipboard());
+    printf("Baris berhasil disalin.\n");
 }
 
-void cutLine(List *L, address *current)
+void cutLine(void)
 {
-    address hapus;
+    address current = getCursor();
 
-    if (First(*L) == NULL || *current == NULL)
+    if (current == NULL)
     {
-        printf("Tidak ada baris aktif\n");
+        printf("Tidak ada baris yang dipilih!\n");
         return;
     }
 
     pushSnapshot();
     clearRedo();
 
-    setClipboard(Info(*current));
+    setClipboard(Info(current));
 
-    hapus = *current;
+    address prevNode = Prev(current);
+    address nextNode = Next(current);
 
-    /* node satu-satunya */
-    if (Prev(hapus) == NULL && Next(hapus) == NULL)
+    if (prevNode != NULL)
     {
-        First(*L) = NULL;
-        *current = NULL;
+        Next(prevNode) = nextNode;
     }
-
-    /* hapus node pertama */
-    else if (Prev(hapus) == NULL)
-    {
-        First(*L) = Next(hapus);
-        Prev(Next(hapus)) = NULL;
-
-        *current = First(*L);
-    }
-
-    /* hapus node terakhir */
-    else if (Next(hapus) == NULL)
-    {
-        Next(Prev(hapus)) = NULL;
-
-        *current = Prev(hapus);
-    }
-
-    /* hapus node tengah */
     else
     {
-        Next(Prev(hapus)) = Next(hapus);
-        Prev(Next(hapus)) = Prev(hapus);
-
-        *current = Next(hapus);
+        First(L) = nextNode;
     }
 
-    free(hapus);
+    if (nextNode != NULL)
+    {
+        Prev(nextNode) = prevNode;
+    }
 
-    printf("Cut berhasil\n");
+    free(current);
+
+    jumlahBaris--;
+
+    if (jumlahBaris <= 0)
+    {
+        jumlahBaris = 0;
+        setCursor(NULL);
+    }
+    else if (nextNode != NULL)
+    {
+        setCursor(nextNode);
+    }
+    else
+    {
+        setCursor(prevNode);
+    }
+
+    isModified = 1;
+
+    printf("Baris berhasil dipotong.\n");
 }
 
-void pasteLine(List *L, address *current)
+void pasteLine(void)
 {
-    address baru;
-
-    if (isClipboardEmpty())
+    if (clipboard[0] == '\0')
     {
-        printf("Clipboard kosong\n");
+        printf("Clipboard kosong!\n");
         return;
     }
 
     pushSnapshot();
     clearRedo();
 
-    baru = Alokasi(getClipboard());
+    address current = getCursor();
 
-    if (baru == NULL)
+    if (First(L) == NULL)
     {
-        printf("Gagal alokasi memori\n");
+        address newNode = Alokasi(clipboard);
+
+        if (newNode == NULL)
+        {
+            printf("Gagal alokasi memori!\n");
+            return;
+        }
+
+        First(L) = newNode;
+
+        setCursor(newNode);
+
+        jumlahBaris++;
+
+        isModified = 1;
+
+        printf("Paste berhasil.\n");
+
         return;
     }
 
-    /* jika list kosong */
-    if (First(*L) == NULL)
+    if (current == NULL)
     {
-        First(*L) = baru;
-        *current = baru;
-
-        printf("Paste berhasil\n");
+        printf("Cursor tidak aktif!\n");
         return;
     }
 
-    /* sisip setelah current */
-    Next(baru) = Next(*current);
-    Prev(baru) = *current;
-
-    if (Next(*current) != NULL)
+    if (strlen(Info(current)) + strlen(clipboard) >= MAX_KARAKTER)
     {
-        Prev(Next(*current)) = baru;
+        printf("Teks terlalu panjang!\n");
+        return;
     }
 
-    Next(*current) = baru;
+    strcat(Info(current), clipboard);
 
-    *current = baru;
+    isModified = 1;
 
-    printf("Paste berhasil\n");
+    printf("Paste berhasil.\n");
 }

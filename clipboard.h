@@ -1,15 +1,13 @@
 #ifndef CLIPBOARD_H
 #define CLIPBOARD_H
 
-#include "config.h"
 #include "text-edit.h"
 
 void setClipboard(const char *text);
-char* getClipboard();
-int isClipboardEmpty();
+const char *getClipboard(void);
 
-void copyLine(List *L, address current);
-void cutLine(List *L, address *current);
-void pasteLine(List *L, address *current);
+void copyLine(void);
+void cutLine(void);
+void pasteLine(void);
 
 #endif
