@@ -20,10 +20,31 @@ void validateCursor(void) {
 }
 
 void setCursor(address node) {
-    address p = First(L);
+    if (node == NULL) {
+        current = NULL;
+        validateCursor();
+        return;
+    }
+
+    address p = current;
     while (p != NULL && p != node) {
         p = Next(p);
     }
+
+    if (p == NULL) {
+        p = current;
+        while (p != NULL && p != node) {
+            p = Prev(p);
+        }
+    }
+
+    if (p == NULL) {
+        p = First(L);
+        while (p != NULL && p != node) {
+            p = Next(p);
+        }
+    }
+
     if (p != NULL) {
         current = node;
     } else {
