@@ -14,12 +14,24 @@ char currentFile[100] = "";
 int cekTxt(char namaFile[])
 {
     int panjang = strlen(namaFile);
-
-    if(panjang < 4)
+    int i;
+    int hanyaSpasi = 1;
+    if(panjang <= 4)
     {
         return 0;
     }
-
+    for (i=0; i<panjang-4; i++)
+    {
+        if (namaFile[i] != ' ')
+        {
+            hanyaSpasi = 0;
+            break;
+        }
+    }
+    if (hanyaSpasi)
+    {
+        return 0;
+    }
     if(namaFile[panjang-4] == '.' &&
         (namaFile[panjang-3] == 't' || namaFile[panjang-3] == 'T') &&
         (namaFile[panjang-2] == 'x' || namaFile[panjang-2] == 'X') &&
@@ -27,7 +39,6 @@ int cekTxt(char namaFile[])
     {
         return 1;
     }
-
     return 0;
 }
 
@@ -42,8 +53,9 @@ void deleteAll()
         P = Next(P);
         free(temp);
     }
-
     First(L) = Nil;
+    jumlahBaris=0;
+    setCursor(Nil);
 }
 
 void openFile()
@@ -51,9 +63,23 @@ void openFile()
     FILE *file;
     char namaFile[100];
     char temp[MAX_KARAKTER];
+    char konfirmasi;
+
+    if(isModified == 1)
+    {
+        printf("Perubahan belum disimpan. Tetap buka file baru? (y/n): ");
+        scanf(" %c", &konfirmasi);
+        while (getchar() != '\n');
+        
+        if (konfirmasi != 'y' && konfirmasi != 'Y')
+        {
+            printf("Open file dibatalkan\n");
+            return;
+        }
+    }
 
     printf("Masukkan nama file (.txt): ");
-    fgets(namaFile, 100, stdin);
+    fgets(namaFile, sizeof(namaFile), stdin);
     namaFile[strcspn(namaFile, "\n")] = '\0';
 
     if(cekTxt(namaFile) == 0)
@@ -70,11 +96,9 @@ void openFile()
 
     pushSnapshot();
     clearRedo();
-
     deleteAll();
-    jumlahBaris = 0;
 
-    while(jumlahBaris < MAX_ROW && fgets(temp, MAX_KARAKTER, file) != NULL)
+    while(fgets(temp, MAX_KARAKTER, file) != NULL)
     {   
         temp[strcspn(temp, "\r\n")] = '\0';
         address P = Alokasi(temp);
@@ -88,11 +112,6 @@ void openFile()
     initCursor();
     strcpy(currentFile, namaFile);
     isModified = 0;
-
-    if(jumlahBaris == MAX_ROW)
-    {
-        printf("File terlalu besar, sebagian tidak dimuat!\n");
-    }
     printf("File berhasil dibuka\n");
 }
 
@@ -101,12 +120,11 @@ void saveFile()
     FILE *file;
     char namaFile[100];
     char konfirmasi;
-    int i;
 
     if(strlen(currentFile)==0)
     {
         printf("Masukkan nama file (.txt): ");
-        fgets(namaFile, 100, stdin);
+        fgets(namaFile, sizeof(namaFile), stdin);
         namaFile[strcspn(namaFile, "\n")] = '\0';
 
         if(cekTxt(namaFile) == 0)
@@ -114,7 +132,6 @@ void saveFile()
             printf("Nama file harus .txt\n");
             return;
         }
-        strcpy(currentFile, namaFile);
     }
     else
     {
@@ -127,11 +144,18 @@ void saveFile()
         printf("Tidak ada perubahan untuk disimpan\n");
         return;
     }
-    printf("File telah diubah. Yakin ingin menyimpan? (y/n): ");
+    printf("Simpan perubahan ke file? (y/n): ");
     scanf(" %c", &konfirmasi);
-    getchar();
+    while (getchar() != '\n');
 
-    if(konfirmasi != 'y' && konfirmasi != 'Y')
+    if (konfirmasi != 'y' && konfirmasi != 'Y' &&
+        konfirmasi != 'n' && konfirmasi != 'N')
+    {
+        printf("Input tidak valid!\n");
+        return;
+    }
+
+    if(konfirmasi == 'n' || konfirmasi == 'N')
     {
         printf("Penyimpanan dibatalkan\n");
         return;
@@ -150,6 +174,7 @@ void saveFile()
         P = Next(P);
     }
     fclose(file);
+    strcpy(currentFile, namaFile);
     isModified=0;
     printf("File berhasil disimpan\n");
 }    

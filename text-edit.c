@@ -5,7 +5,9 @@
 #include "cursor.h"
 #include "history.h"
 #include "config.h"
+
 extern int isModified;
+
 List L;
 int jumlahBaris = 0;
 
@@ -38,7 +40,7 @@ void tampilkan()
 {
     address temp = First(L);
     int i=1;
-    while (temp != NULL)
+    while (temp != Nil)
     {
         printf ("%2d | %s\n", i, Info(temp));
         temp = Next(temp);
@@ -48,18 +50,35 @@ void tampilkan()
 
 void insertFirst(address P)
 {
+    if(P==Nil)
+    {
+        return;
+    }
+    Prev(P)=Nil;
+
     if(First(L)!=Nil)
     {
         Prev(First(L))=P;
         Next(P)=First(L);
+    }
+    else
+    {
+        Next(P)=Nil;
     }
     First(L)=P;
 }
 
 void insertLast(address P)
 {
+    if(P==Nil)
+    {
+        return;
+    }
+    Next(P)=Nil;
+
     if(First(L)==Nil)
     {
+        Prev(P)=Nil;
         First(L)=P;
         return;
     }
@@ -74,6 +93,11 @@ void insertLast(address P)
 
 void insertBefore (address P, address temp)
 {
+    if (P == Nil || temp == Nil)
+    {
+        return;
+    }
+    
     address before = Prev(temp);
     if (before == Nil)
     {
@@ -90,26 +114,22 @@ void insertBefore (address P, address temp)
 
 void tambahBaris()
 {
-    if(jumlahBaris >= MAX_ROW)
-	{
-        printf("Buffer penuh!\n");
-        return;
-    }
-    pushSnapshot();
-    clearRedo();
-
     infotype teks;
     printf("Masukkan teks: "); 
     fgets(teks, MAX_KARAKTER, stdin);
     teks[strcspn(teks, "\n")] = 0;
 
     address P = Alokasi(teks);
+    if (P == Nil)
+    {
+        printf("Alokasi memori gagal\n");
+        return;
+    }
+    pushSnapshot();
+    clearRedo();
+    
     address cursor = getCursor();
     if (First(L)==Nil)
-    {
-        insertFirst(P);
-    }
-    else if(cursor == First(L) || cursor == Nil)
     {
         insertFirst(P);
     }
@@ -132,8 +152,6 @@ void editBaris()
 
     printf("Masukkan nomor baris yang ingin diubah: ");
     scanf("%d", &nomor);
-    getchar();
-    
     while (getchar()!='\n');
     
     if(nomor < 1 || nomor > jumlahBaris){
