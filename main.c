@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "text-edit.h"
 #include "clipboard.h"
@@ -11,11 +12,18 @@
 
 extern List L;
 extern int jumlahBaris;
+extern int isModified;
+
+void pauseScreen(void)
+{
+    printf("\nTekan ENTER untuk melanjutkan...");
+    getchar(); 
+}
 
 void tampilkanHeader(void)
 {
     printf("=========================================\n");
-    printf("         TxTree Text Editor\n");
+    printf("        TxTree Text Editor \xF0\x9F\x8C\xB3\n"); 
     printf("=========================================\n");
 }
 
@@ -29,25 +37,25 @@ void tampilkanMenu(void)
     printf("5. Copy Baris\n");
     printf("6. Cut Baris\n");
     printf("7. Paste Baris\n");
-    printf("8. Undo\n");
-    printf("9. Redo\n");
-    printf("10. Keluar\n");
+    printf("8. Pindah Cursor\n");
+    printf("9. Undo\n");
+    printf("10. Redo\n");
+    printf("11. Keluar\n");
     printf("==========================\n");
 }
 
 void clearInputBuffer(void)
 {
     int c;
-
     while ((c = getchar()) != '\n' && c != EOF)
     {
+        
     }
 }
 
 int inputInt(void)
 {
     int value;
-
     while (1)
     {
         if (scanf("%d", &value) == 1)
@@ -55,9 +63,28 @@ int inputInt(void)
             clearInputBuffer();
             return value;
         }
-
-        printf("Input tidak valid! Masukkan angka: ");
+        printf("Input tidak valid! Masukkan angka yang benar: ");
         clearInputBuffer();
+    }
+}
+
+int konfirmasiKeluar(void)
+{
+    char jawab;
+    while (1)
+    {
+        printf("\nMasih ada perubahan yang belum disimpan.\n");
+        printf("Yakin ingin keluar? (y/n): ");
+
+        scanf(" %c", &jawab);
+        clearInputBuffer();
+
+        jawab = (char)tolower((unsigned char)jawab);
+
+        if (jawab == 'y') return 1;
+        if (jawab == 'n') return 0;
+
+        printf("Pilihan tidak valid! Gunakan 'y' atau 'n'.\n");
     }
 }
 
@@ -66,40 +93,33 @@ int main(void)
     int pilihan;
 
     CreateList(&L);
-
     initCursor();
-
     setClipboard("");
 
     while (1)
     {
         CLEAR();
-
         tampilkanHeader();
-
-        printf("\n=== ISI DOKUMEN ===\n");
-
-        tampilkan();
 
         validateCursor();
 
+        printf("\n=== ISI DOKUMEN ===\n");
+        tampilkan();
+
         if (getCursor() != NULL)
         {
-            printf("\nCursor di baris: %d\n", getCursorIndex() + 1);
+            printf("\nCursor aktif di baris: %d\n", getCursorIndex() + 1);
         }
         else
         {
-            printf("\nCursor belum aktif\n");
+            printf("\nCursor belum dipilih\n");
         }
 
         tampilkanMenu();
-
         printf("Pilih menu: ");
-
         pilihan = inputInt();
 
         CLEAR();
-
         tampilkanHeader();
 
         switch (pilihan)
@@ -109,7 +129,14 @@ int main(void)
                 break;
 
             case 2:
-                editBaris();
+                if (jumlahBaris == 0)
+                {
+                    printf("Dokumen masih kosong. Tambahkan baris terlebih dahulu.\n");
+                }
+                else
+                {
+                    editBaris();
+                }
                 break;
 
             case 3:
@@ -121,11 +148,25 @@ int main(void)
                 break;
 
             case 5:
-                copyLine();
+                if (jumlahBaris == 0)
+                {
+                    printf("Tidak ada baris yang bisa disalin.\n");
+                }
+                else
+                {
+                    copyLine();
+                }
                 break;
 
             case 6:
-                cutLine();
+                if (jumlahBaris == 0)
+                {
+                    printf("Tidak ada baris yang bisa dipotong.\n");
+                }
+                else
+                {
+                    cutLine();
+                }
                 break;
 
             case 7:
@@ -133,24 +174,49 @@ int main(void)
                 break;
 
             case 8:
-                undo();
+                if (jumlahBaris == 0)
+                {
+                    printf("Dokumen kosong. Cursor tidak bisa dipindahkan.\n");
+                }
+                else
+                {
+                    printf("Masukkan nomor baris target (1-%d): ", jumlahBaris);
+                    int target = inputInt();
+                    
+                    if (target >= 1 && target <= jumlahBaris) 
+                    {
+                        // PERBAIKAN: Mengirimkan target index (0-based) ke dalam setCursor()
+                        setCursor(target - 1); 
+                        printf("Cursor berhasil dipindahkan ke baris %d.\n", target);
+                    } 
+                    else 
+                    {
+                        printf("Nomor baris di luar jangkauan!\n");
+                    }
+                }
                 break;
 
             case 9:
-                redo();
+                undo();
                 break;
 
             case 10:
-                printf("Keluar program...\n");
+                redo();
+                break;
+
+            case 11:
+                if (isModified && !konfirmasiKeluar())
+                {
+                    break;
+                }
+                printf("Menutup program...\n");
                 clearHistory();
                 return 0;
 
             default:
-                printf("Menu tidak valid!\n");
+                printf("Menu tidak tersedia. Silakan pilih menu yang benar.\n");
                 break;
         }
-
-        validateCursor();
 
         pauseScreen();
     }
