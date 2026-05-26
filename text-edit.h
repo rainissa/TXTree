@@ -26,7 +26,7 @@ void CreateList (List *L);
 void pauseScreen();
 void insertFirst(address P);
 void insertLast(address P);
-void insertBefore(address P, address temp);
+void insertAfter(address cursor, address P);
 void tampilkan();
 void tambahBaris();
 void editBaris();

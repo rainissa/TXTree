@@ -91,24 +91,25 @@ void insertLast(address P)
     Prev(P)=temp;
 }
 
-void insertBefore (address P, address temp)
+void insertAfter (address cursor, address P)
 {
-    if (P == Nil || temp == Nil)
+    if (cursor == Nil || P == Nil)
     {
         return;
     }
     
-    address before = Prev(temp);
-    if (before == Nil)
+    address after = Next(cursor);
+    Next(cursor) = P;
+    Prev(P) = cursor;
+
+    if (after != Nil)
     {
-        insertFirst(P);
+        Next(P) = after;
+        Prev(after) = P;
     }
     else
     {
-        Next(before) = P;
-        Prev(P) = before;
-        Next(P) = temp;
-        Prev(temp) = P;
+        Next(P) = Nil;
     }
 }
 
@@ -139,7 +140,7 @@ void tambahBaris()
     }
     else
     {
-        insertBefore(P, cursor);
+        insertAfter(cursor, P);
     }
     setCursor(P);  // update cursor di baris baru
     jumlahBaris = jumlahBaris + 1;
@@ -153,11 +154,6 @@ void editBaris()
     printf("Masukkan nomor baris yang ingin diubah: ");
     scanf("%d", &nomor);
     while (getchar()!='\n');
-    
-    if(nomor < 1 || nomor > jumlahBaris){
-        printf("Baris tidak ditemukan!\n");
-        return;
-    }
 
     pushSnapshot();
     clearRedo();
@@ -169,7 +165,7 @@ void editBaris()
         temp = Next(temp);
         i=i+1;
     }
-    if (temp == Nil)
+    if (temp == Nil || i != nomor)
     {
         printf("Baris tidak ditemukan!\n");
         return;
