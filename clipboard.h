@@ -3,8 +3,6 @@
 
 #include "text-edit.h"
 
-static int cursorAktif(address current);
-
 void setClipboard(const char *text);
 const char *getClipboard(void);
 

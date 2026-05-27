@@ -14,12 +14,6 @@ extern List L;
 extern int jumlahBaris;
 extern int isModified;
 
-void pauseScreen(void)
-{
-    printf("\nTekan ENTER untuk melanjutkan...");
-    getchar(); 
-}
-
 void tampilkanHeader(void)
 {
     printf("=========================================\n");
@@ -172,29 +166,30 @@ int main(void)
             case 7:
                 pasteLine();
                 break;
-
+                
             case 8:
-                if (jumlahBaris == 0)
-                {
-                    printf("Dokumen kosong. Cursor tidak bisa dipindahkan.\n");
-                }
-                else
-                {
-                    printf("Masukkan nomor baris target (1-%d): ", jumlahBaris);
-                    int target = inputInt();
-                    
-                    if (target >= 1 && target <= jumlahBaris) 
+			    int target;
+			
+			    if (jumlahBaris == 0)
+			    {
+			        printf("Dokumen kosong. Cursor tidak bisa dipindahkan.\n");
+			    }
+			    else
+			    {
+			    	printf("Masukkan nomor baris target (1-%d): ", jumlahBaris);
+			        target = inputInt();
+			        
+			        if (target >= 1 && target <= jumlahBaris) 
                     {
-                        // PERBAIKAN: Mengirimkan target index (0-based) ke dalam setCursor()
-                        setCursor(target - 1); 
+                        restoreCursorByIndex(target - 1);
                         printf("Cursor berhasil dipindahkan ke baris %d.\n", target);
                     } 
                     else 
                     {
                         printf("Nomor baris di luar jangkauan!\n");
                     }
-                }
-                break;
+			    }
+			    break;
 
             case 9:
                 undo();
