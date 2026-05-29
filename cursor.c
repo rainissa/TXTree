@@ -9,6 +9,16 @@ void initCursor(void) {
     current = First(L);
 }
 
+void validateCursor(void) {
+    if (First(L) == NULL) {
+        current = NULL;
+        return;
+    }
+    if (current == NULL) {
+        current = First(L);
+    }
+}
+
 void setCursor(address node) {
     if (node == NULL) {
         current = NULL;
@@ -81,4 +91,8 @@ void restoreCursorByIndex(int index) {
     } else {
         setCursor(First(L));
     }
+}
+
+void resetCursor(void) {
+    current = NULL;
 }

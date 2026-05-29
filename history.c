@@ -68,7 +68,6 @@ static address_snap popFromStack(address_snap *stack) {
 }
 
 static void restoreSnapshot(Snapshot *snap) {
-    // free list aktif
     address p = First(L);
     while (p != NULL) {
         address hapus = p;
@@ -76,16 +75,22 @@ static void restoreSnapshot(Snapshot *snap) {
         free(hapus);
     }
     First(L) = NULL;
-
-    // rebuild dari snapshot
+    resetCursor(); 
+    
+    int count = 0;
     SnapBaris *src = snap->head;
     while (src != NULL) {
         address node = Alokasi(src->teks);
-        if (node) insertLast(node);
+        if (node == NULL) {
+            printf("[!] Gagal me-restore seluruh baris karena memori penuh.\n");
+            break;
+        }
+        insertLast(node);
+        count++;
         src = src->next;
     }
 
-    jumlahBaris = snap->jumlahBaris;
+    jumlahBaris = count;
     restoreCursorByIndex(snap->cursor_index);
 }
 
