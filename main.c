@@ -142,25 +142,11 @@ int main(void)
                 break;
 
             case 5:
-                if (jumlahBaris == 0)
-                {
-                    printf("[!] Tidak ada baris yang bisa disalin.\n");
-                }
-                else
-                {
-                    copyLine();
-                }
+                copyLine();
                 break;
 
             case 6:
-                if (jumlahBaris == 0)
-                {
-                    printf("[!] Tidak ada baris yang bisa dipotong.\n");
-                }
-                else
-                {
-                    cutLine();
-                }
+                cutLine();
                 break;
 
             case 7:
