@@ -26,6 +26,18 @@ void setCursor(address node) {
         return;
     }
 
+    if (current == NULL) {
+        address p = First(L);
+        while (p != NULL && p != node) {
+            p = Next(p);
+        }
+        if (p != NULL) current = node;
+        else current = NULL;
+        
+        validateCursor();
+        return;
+    }
+
     address p = current;
     while (p != NULL && p != node) {
         p = Next(p);
@@ -35,13 +47,6 @@ void setCursor(address node) {
         p = current;
         while (p != NULL && p != node) {
             p = Prev(p);
-        }
-    }
-
-    if (p == NULL) {
-        p = First(L);
-        while (p != NULL && p != node) {
-            p = Next(p);
         }
     }
 
@@ -86,4 +91,8 @@ void restoreCursorByIndex(int index) {
     } else {
         setCursor(First(L));
     }
+}
+
+void resetCursor(void) {
+    current = NULL;
 }

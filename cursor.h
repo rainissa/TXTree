@@ -9,5 +9,6 @@ void setCursor(address node);
 address getCursor(void);
 int getCursorIndex(void);
 void restoreCursorByIndex(int index);
+void resetCursor(void);
 
 #endif
