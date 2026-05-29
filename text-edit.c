@@ -123,7 +123,7 @@ void tambahBaris()
     address P = Alokasi(teks);
     if (P == Nil)
     {
-        printf("Alokasi memori gagal\n");
+        printf("[!] Alokasi memori gagal\n");
         return;
     }
     pushSnapshot();
@@ -145,6 +145,7 @@ void tambahBaris()
     setCursor(P);  // update cursor di baris baru
     jumlahBaris = jumlahBaris + 1;
     isModified = 1;
+    printf("[v] Baris berhasil ditambahkan\n");
 }
 
 void editBaris()
@@ -167,7 +168,7 @@ void editBaris()
     }
     if (temp == Nil || i != nomor)
     {
-        printf("Baris tidak ditemukan!\n");
+        printf("[!] Baris tidak ditemukan!\n");
         return;
     }
     printf("Masukkan teks pengganti: ");
@@ -175,4 +176,5 @@ void editBaris()
     Info(temp)[strcspn(Info(temp), "\n")] = 0;
     setCursor(temp);
     isModified = 1;
+    printf("[v] Baris berhasil diubah\n");
 }

@@ -73,7 +73,7 @@ void openFile()
         
         if (konfirmasi != 'y' && konfirmasi != 'Y')
         {
-            printf("Open file dibatalkan\n");
+            printf("[!] Open file dibatalkan\n");
             return;
         }
     }
@@ -84,13 +84,13 @@ void openFile()
 
     if(cekTxt(namaFile) == 0)
     {
-        printf("File harus berekstensi .txt\n");
+        printf("[!] File harus berekstensi .txt\n");
         return;
     }
     file = fopen(namaFile, "r");
     if(file == NULL)
     {
-        printf("File tidak ditemukan\n");
+        printf("[!] File tidak ditemukan\n");
         return;
     }
 
@@ -107,12 +107,16 @@ void openFile()
             insertLast(P);
             jumlahBaris = jumlahBaris + 1;
         }
+        else
+        {
+            printf("[!] Gagal mengalokasikan memori\n");
+        }
     }
     fclose(file);
     initCursor();
     strcpy(currentFile, namaFile);
     isModified = 0;
-    printf("File berhasil dibuka\n");
+    printf("[v] File berhasil dibuka\n");
 }
 
 void saveFile()
@@ -129,7 +133,7 @@ void saveFile()
 
         if(cekTxt(namaFile) == 0)
         {
-            printf("Nama file harus .txt\n");
+            printf("[!] Nama file harus .txt\n");
             return;
         }
     }
@@ -141,7 +145,7 @@ void saveFile()
 
     if(isModified==0)
     {
-        printf("Tidak ada perubahan untuk disimpan\n");
+        printf("[!] Tidak ada perubahan untuk disimpan\n");
         return;
     }
     printf("Simpan perubahan ke file? (y/n): ");
@@ -151,20 +155,20 @@ void saveFile()
     if (konfirmasi != 'y' && konfirmasi != 'Y' &&
         konfirmasi != 'n' && konfirmasi != 'N')
     {
-        printf("Input tidak valid!\n");
+        printf("[!] Input tidak valid!\n");
         return;
     }
 
     if(konfirmasi == 'n' || konfirmasi == 'N')
     {
-        printf("Penyimpanan dibatalkan\n");
+        printf("[!] Penyimpanan dibatalkan\n");
         return;
     }
 
     file = fopen(namaFile, "w");
     if(file == NULL)
     {
-        printf("Gagal menyimpan file\n");
+        printf("[!] Gagal menyimpan file\n");
         return;
     }
     address P = First(L);
@@ -176,5 +180,5 @@ void saveFile()
     fclose(file);
     strcpy(currentFile, namaFile);
     isModified=0;
-    printf("File berhasil disimpan\n");
+    printf("[v] File berhasil disimpan\n");
 }    
