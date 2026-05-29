@@ -154,6 +154,7 @@ int main(void)
                 break;
                 
             case 8:
+            {
 			    int target;
 			
 			    if (jumlahBaris == 0)
@@ -176,6 +177,7 @@ int main(void)
                     }
 			    }
 			    break;
+            }
 
             case 9:
                 undo();

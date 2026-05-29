@@ -67,6 +67,23 @@ static address_snap popFromStack(address_snap *stack) {
     return target;
 }
 
+static void popBottom(address_snap *stack) {
+    if (*stack == NULL) return;
+    if ((*stack)->next == NULL) {
+        freeSnapBaris((*stack)->info.head);
+        free(*stack);
+        *stack = NULL;
+        return;
+    }
+    address_snap p = *stack;
+    while (p->next->next != NULL) {
+        p = p->next;
+    }
+    freeSnapBaris(p->next->info.head);
+    free(p->next);
+    p->next = NULL;
+}
+
 static void restoreSnapshot(Snapshot *snap) {
     address p = First(L);
     while (p != NULL) {
@@ -103,6 +120,14 @@ void clearRedo(void) {
 }
 
 void pushSnapshot(void) {
+    if (undoStack != NULL) {
+        int count = 0;
+        address_snap p = undoStack;
+        while (p != NULL) { count++; p = p->next; }
+        if (count >= STACK_SIZE) {
+            popBottom(&undoStack);
+        }
+    }
     address_snap new_snap = alokasiSnapshot();
     if (new_snap != NULL) {
         pushToStack(&undoStack, new_snap);
