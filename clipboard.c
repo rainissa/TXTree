@@ -140,7 +140,7 @@ void pasteLine(void)
     if (clipLen > available)
     {
         strncat(Info(current), clipboard, available);
-        printf("[~] Paste sebagian: hanya %zu dari %zu karakter yang bisa ditempel"
+        printf("[v] Paste sebagian: hanya %zu dari %zu karakter yang bisa ditempel"
                " (baris hampir penuh).\n",
                available, clipLen);
     }

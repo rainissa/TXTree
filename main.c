@@ -17,7 +17,7 @@ extern int isModified;
 void tampilkanHeader(void)
 {
     printf("=========================================\n");
-    printf("        TxTree Text Editor \xF0\x9F\x8C\xB3\n"); 
+    printf("             TxTree Text Editor          \n"); 
     printf("=========================================\n");
 }
 
@@ -57,7 +57,7 @@ int inputInt(void)
             clearInputBuffer();
             return value;
         }
-        printf("Input tidak valid! Masukkan angka yang benar: ");
+        printf("[!] Input tidak valid! Masukkan angka yang benar: ");
         clearInputBuffer();
     }
 }
@@ -78,7 +78,7 @@ int konfirmasiKeluar(void)
         if (jawab == 'y') return 1;
         if (jawab == 'n') return 0;
 
-        printf("Pilihan tidak valid! Gunakan 'y' atau 'n'.\n");
+        printf("[!] Pilihan tidak valid! Gunakan 'y' atau 'n'.\n");
     }
 }
 
@@ -106,7 +106,7 @@ int main(void)
         }
         else
         {
-            printf("\nCursor belum dipilih\n");
+            printf("\n[!] Cursor belum dipilih\n");
         }
 
         tampilkanMenu();
@@ -125,7 +125,7 @@ int main(void)
             case 2:
                 if (jumlahBaris == 0)
                 {
-                    printf("Dokumen masih kosong. Tambahkan baris terlebih dahulu.\n");
+                    printf("[!] Dokumen masih kosong. Tambahkan baris terlebih dahulu.\n");
                 }
                 else
                 {
@@ -144,7 +144,7 @@ int main(void)
             case 5:
                 if (jumlahBaris == 0)
                 {
-                    printf("Tidak ada baris yang bisa disalin.\n");
+                    printf("[!] Tidak ada baris yang bisa disalin.\n");
                 }
                 else
                 {
@@ -155,7 +155,7 @@ int main(void)
             case 6:
                 if (jumlahBaris == 0)
                 {
-                    printf("Tidak ada baris yang bisa dipotong.\n");
+                    printf("[!] Tidak ada baris yang bisa dipotong.\n");
                 }
                 else
                 {
@@ -172,7 +172,7 @@ int main(void)
 			
 			    if (jumlahBaris == 0)
 			    {
-			        printf("Dokumen kosong. Cursor tidak bisa dipindahkan.\n");
+			        printf("[!] Dokumen kosong. Cursor tidak bisa dipindahkan.\n");
 			    }
 			    else
 			    {
@@ -182,11 +182,11 @@ int main(void)
 			        if (target >= 1 && target <= jumlahBaris) 
                     {
                         restoreCursorByIndex(target - 1);
-                        printf("Cursor berhasil dipindahkan ke baris %d.\n", target);
+                        printf("[v] Cursor berhasil dipindahkan ke baris %d.\n", target);
                     } 
                     else 
                     {
-                        printf("Nomor baris di luar jangkauan!\n");
+                        printf("[!] Nomor baris di luar jangkauan!\n");
                     }
 			    }
 			    break;
@@ -209,7 +209,7 @@ int main(void)
                 return 0;
 
             default:
-                printf("Menu tidak tersedia. Silakan pilih menu yang benar.\n");
+                printf("[!] Menu tidak tersedia. Silakan pilih menu yang benar.\n");
                 break;
         }
 
