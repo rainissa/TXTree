@@ -113,9 +113,45 @@ void insertAfter (address cursor, address P)
     }
 }
 
+void insertBefore(address cursor, address P)
+{
+    if (P==Nil)
+    {
+        return;
+    }
+    if (cursor==Nil)
+    {
+        insertFirst(P);
+        return;
+    }
+    address before = Prev(cursor);
+    Next(P)=cursor;
+    Prev(cursor)=P;
+    if (before != Nil)
+    {
+        Next(before) = P;
+        Prev(P) = before;
+    }
+    else
+    {
+        Prev(P)=Nil;
+        First(L)=P;
+    }
+}
+
 void tambahBaris()
 {
     infotype teks;
+    int pilihan;
+    printf("Sisip sebelum atau sesudah cursor? (0 = sebelum, 1 = sesudah): ");
+    scanf("%d", &pilihan);
+    while(getchar() != '\n');
+    while(pilihan != 0 && pilihan != 1)
+    {
+        printf("[!] Input tidak valid, masukkan 0 atau 1: ");
+        scanf("%d", &pilihan);
+        while(getchar() != '\n');
+    }
     printf("Masukkan teks: "); 
     fgets(teks, MAX_KARAKTER, stdin);
     teks[strcspn(teks, "\n")] = 0;
@@ -134,13 +170,17 @@ void tambahBaris()
     {
         insertFirst(P);
     }
+    else if (pilihan == 0)
+    {
+        insertBefore(Prev(cursor), P);
+    }
     else if (Next(cursor)==Nil)
     {
         insertLast(P);
     }
     else
     {
-        insertAfter(cursor, P);
+        insertAfter(Next(cursor), P);
     }
     setCursor(P);  // update cursor di baris baru
     jumlahBaris = jumlahBaris + 1;
