@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <limits.h>
 
 #include "text-edit.h"
 #include "clipboard.h"
@@ -38,43 +39,113 @@ void tampilkanMenu(void)
     printf("==========================\n");
 }
 
-void clearInputBuffer(void)
-{
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-    {
-        
-    }
-}
-
 int inputInt(void)
 {
+    char buf[23];
     int value;
+
     while (1)
     {
-        if (scanf("%d", &value) == 1)
+        if (fgets(buf, sizeof(buf), stdin) == NULL)
+            continue;
+
+        int terlalupanjang = 1;
+        for (int i = 0; buf[i] != '\0'; i++)
         {
-            clearInputBuffer();
-            return value;
+            if (buf[i] == '\n') { terlalupanjang = 0; break; }
         }
-        printf("[!] Input tidak valid! Masukkan angka yang benar: ");
-        clearInputBuffer();
+        if (terlalupanjang)
+        {
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
+            printf("[!] Input terlalu panjang! Masukkan angka yang benar: ");
+            continue;
+        }
+
+        char *ptr = buf;
+        while (*ptr == ' ' || *ptr == '\t') ptr++;
+
+        if (*ptr == '\0' || *ptr == '\n')
+        {
+            printf("[!] Input tidak boleh kosong! Masukkan angka yang benar: ");
+            continue;
+        }
+
+        char *check = ptr;
+        int valid = 1;
+        while (*check != '\0' && *check != '\n')
+        {
+            if (!isdigit((unsigned char)*check))
+            {
+                valid = 0;
+                break;
+            }
+            check++;
+        }
+
+        if (!valid)
+        {
+            printf("[!] Input tidak valid! Masukkan angka saja: ");
+            continue;
+        }
+
+        char *endptr;
+        long result = strtol(ptr, &endptr, 10);
+
+        if (result > INT_MAX || result < INT_MIN)
+        {
+            printf("[!] Angka terlalu besar! Masukkan angka yang benar: ");
+            continue;
+        }
+
+        value = (int)result;
+        return value;
     }
 }
 
 int konfirmasiKeluar(void)
 {
+    char buf[23];
     char jawab;
+
     while (1)
     {
         printf("\nMasih ada perubahan yang belum disimpan.\n");
         printf("Yakin ingin keluar? (y/n): ");
 
-        scanf(" %c", &jawab);
-        clearInputBuffer();
+        if (fgets(buf, sizeof(buf), stdin) == NULL) continue;
 
-        jawab = (char)tolower((unsigned char)jawab);
+        int terlalupanjang = 1;
+        for (int i = 0; buf[i] != '\0'; i++)
+        {
+            if (buf[i] == '\n') { terlalupanjang = 0; break; }
+        }
+        if (terlalupanjang)
+        {
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
+            printf("[!] Pilihan tidak valid! Gunakan 'y' atau 'n'.\n");
+            continue;
+        }
 
+        char *ptr = buf;
+        while (*ptr == ' ' || *ptr == '\t') ptr++;
+
+        if (*ptr == '\0' || *ptr == '\n')
+        {
+            printf("[!] Input tidak boleh kosong! Gunakan 'y' atau 'n'.\n");
+            continue;
+        }
+
+        char *check = ptr + 1;
+        while (*check == ' ' || *check == '\t') check++; // skip spasi di belakang juga
+        if (*check != '\n' && *check != '\0')
+        {
+            printf("[!] Pilihan tidak valid! Gunakan 'y' atau 'n'.\n");
+            continue;
+        }
+
+        jawab = (char)tolower((unsigned char)*ptr);
         if (jawab == 'y') return 1;
         if (jawab == 'n') return 0;
 
